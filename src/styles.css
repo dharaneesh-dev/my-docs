@@ -1,0 +1,278 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: "Google Sans Text", "Roboto", system-ui, sans-serif;
+  --font-display: "Google Sans", "Google Sans Text", system-ui, sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* Light by default — Google Cloud Docs aesthetic */
+:root {
+  --radius: 0.5rem;
+
+  --background: oklch(1 0 0);                       /* #ffffff */
+  --foreground: oklch(0.26 0.012 250);              /* #202124 Google grey 900 */
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.26 0.012 250);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.26 0.012 250);
+
+  --primary: oklch(0.55 0.18 256);                  /* #1a73e8 Google blue */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.97 0.005 250);
+  --secondary-foreground: oklch(0.26 0.012 250);
+
+  --muted: oklch(0.97 0.005 250);                   /* #f8f9fa */
+  --muted-foreground: oklch(0.48 0.012 250);        /* #5f6368 Google grey 700 */
+
+  --accent: oklch(0.95 0.025 256);                  /* #e8f0fe */
+  --accent-foreground: oklch(0.45 0.18 256);        /* #1967d2 */
+
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(1 0 0);
+
+  --border: oklch(0.91 0.005 250);                  /* #dadce0 */
+  --input: oklch(0.91 0.005 250);
+  --ring: oklch(0.55 0.18 256);
+
+  --sidebar: oklch(0.99 0.003 250);
+  --sidebar-foreground: oklch(0.26 0.012 250);
+  --sidebar-primary: oklch(0.55 0.18 256);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.025 256);
+  --sidebar-accent-foreground: oklch(0.45 0.18 256);
+  --sidebar-border: oklch(0.93 0.005 250);
+  --sidebar-ring: oklch(0.55 0.18 256);
+}
+
+.dark {
+  --background: oklch(0.18 0.012 260);
+  --foreground: oklch(0.96 0.005 250);
+  --card: oklch(0.21 0.012 260);
+  --card-foreground: oklch(0.96 0.005 250);
+  --popover: oklch(0.21 0.012 260);
+  --popover-foreground: oklch(0.96 0.005 250);
+  --primary: oklch(0.72 0.14 250);
+  --primary-foreground: oklch(0.18 0.012 260);
+  --secondary: oklch(0.26 0.012 260);
+  --secondary-foreground: oklch(0.96 0.005 250);
+  --muted: oklch(0.24 0.012 260);
+  --muted-foreground: oklch(0.72 0.012 250);
+  --accent: oklch(0.3 0.04 256);
+  --accent-foreground: oklch(0.85 0.1 256);
+  --border: oklch(0.3 0.012 260);
+  --input: oklch(0.3 0.012 260);
+  --ring: oklch(0.72 0.14 250);
+  --sidebar: oklch(0.2 0.012 260);
+  --sidebar-foreground: oklch(0.92 0.005 250);
+  --sidebar-primary: oklch(0.72 0.14 250);
+  --sidebar-primary-foreground: oklch(0.18 0.012 260);
+  --sidebar-accent: oklch(0.3 0.04 256);
+  --sidebar-accent-foreground: oklch(0.92 0.1 256);
+  --sidebar-border: oklch(0.28 0.012 260);
+  --sidebar-ring: oklch(0.72 0.14 250);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body { font-family: var(--font-sans); }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
+  code, pre, kbd { font-family: var(--font-mono); }
+  ::selection { background: oklch(0.55 0.18 256 / 0.18); }
+}
+
+@utility card-hover {
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+  &:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 1px 3px 0 rgb(60 64 67 / 0.12), 0 4px 12px 0 rgb(60 64 67 / 0.08);
+  }
+}
+
+@utility prose-docs {
+  color: var(--color-foreground);
+  font-size: 14px;
+  line-height: 1.7;
+  & h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--color-foreground);
+    margin-top: 2.25rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    scroll-margin-top: 5rem;
+    letter-spacing: -0.005em;
+  }
+  & h3 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+    scroll-margin-top: 5rem;
+  }
+  & p { margin-bottom: 0.9rem; }
+  & a { color: var(--color-primary); text-decoration: none; }
+  & a:hover { text-decoration: underline; }
+  & ul, & ol { margin: 0.5rem 0 1rem; padding-left: 1.5rem; }
+  & ul { list-style: disc; }
+  & ol { list-style: decimal; }
+  & li { margin-bottom: 0.25rem; }
+  & li::marker { color: var(--color-muted-foreground); }
+  & blockquote {
+    border-left: 4px solid var(--color-primary);
+    background: var(--color-muted);
+    padding: 0.5rem 1rem;
+    color: var(--color-muted-foreground);
+    margin: 1rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  & hr { border-color: var(--color-border); margin: 1.5rem 0; }
+  & table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 13px; }
+  & th, & td { border: 1px solid var(--color-border); padding: 0.5rem 0.75rem; text-align: left; }
+  & th { background: var(--color-muted); font-weight: 500; }
+  & :not(pre) > code {
+    background: var(--color-muted);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
+  }
+  & img { border-radius: 6px; border: 1px solid var(--color-border); }
+}
+
+/* Shiki dual-theme: switch to dark colors when .dark class is active */
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/* ---------------- Custom animated scrollbar (global) ---------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-border) 70%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 200ms ease;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--color-primary) 60%, var(--color-border));
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner { background: transparent; }
+
+/* ---------------- Live status dot ---------------- */
+@utility live-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: oklch(0.72 0.19 145);
+  box-shadow: 0 0 0 0 oklch(0.72 0.19 145 / 0.6);
+  animation: live-pulse 1.6s ease-out infinite;
+}
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 oklch(0.72 0.19 145 / 0.55); }
+  70%  { box-shadow: 0 0 0 8px oklch(0.72 0.19 145 / 0); }
+  100% { box-shadow: 0 0 0 0 oklch(0.72 0.19 145 / 0); }
+}
+
+/* ---------------- Phone input theming (react-phone-number-input) ---------------- */
+.phone-input {
+  --PhoneInputCountryFlag-height: 1em;
+  --PhoneInputCountrySelectArrow-color: var(--color-muted-foreground);
+  --PhoneInput-color--focus: var(--color-ring);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-input);
+  background: var(--color-background);
+  padding: 0 0.75rem;
+}
+.phone-input:focus-within {
+  outline: 2px solid var(--color-ring);
+  outline-offset: -1px;
+}
+.phone-input .PhoneInputInput {
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font-size: 13px;
+  color: var(--color-foreground);
+}
+.phone-input .PhoneInputInput::placeholder { color: var(--color-muted-foreground); }
+.phone-input .PhoneInputCountrySelect { color: var(--color-foreground); }
+.phone-input .PhoneInputCountryIcon--border {
+  background: transparent;
+  box-shadow: none;
+}

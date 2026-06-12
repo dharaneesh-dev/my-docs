@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Interactive Particles</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b1020; overflow: hidden;
+    font: 12px/1.4 system-ui, sans-serif; color: #cdd6f4; }
+  #c { display: block; width: 100%; height: 100%; cursor: crosshair; }
+  .hint { position: fixed; top: 8px; left: 10px; opacity: .7; pointer-events: none; }
+</style>
+</head>
+<body>
+  <div class="hint">Move your mouse · click to burst</div>
+  <canvas id="c"></canvas>
+<script>
+  const cvs = document.getElementById('c');
+  const ctx = cvs.getContext('2d');
+  let w, h, mx = -1e3, my = -1e3;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    w = cvs.clientWidth; h = cvs.clientHeight;
+    cvs.width = w * dpr; cvs.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  new ResizeObserver(resize).observe(cvs);
+  resize();
+
+  const N = 120;
+  const parts = Array.from({ length: N }, () => ({
+    x: Math.random() * w, y: Math.random() * h,
+    vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6,
+    r: 1 + Math.random() * 2,
+  }));
+
+  addEventListener('mousemove', e => {
+    const r = cvs.getBoundingClientRect();
+    mx = e.clientX - r.left; my = e.clientY - r.top;
+  });
+  addEventListener('mouseleave', () => { mx = -1e3; my = -1e3; });
+  cvs.addEventListener('click', e => {
+    const r = cvs.getBoundingClientRect();
+    const cx = e.clientX - r.left, cy = e.clientY - r.top;
+    for (const p of parts) {
+      const dx = p.x - cx, dy = p.y - cy, d = Math.hypot(dx, dy) || 1;
+      p.vx += (dx / d) * 6; p.vy += (dy / d) * 6;
+    }
+  });
+
+  function tick() {
+    ctx.fillStyle = 'rgba(11,16,32,.25)';
+    ctx.fillRect(0, 0, w, h);
+
+    for (const p of parts) {
+      const dx = p.x - mx, dy = p.y - my, d2 = dx*dx + dy*dy;
+      if (d2 < 140*140) {
+        const f = (1 - Math.sqrt(d2)/140) * 0.6;
+        p.vx += (dx / Math.sqrt(d2)) * f;
+        p.vy += (dy / Math.sqrt(d2)) * f;
+      }
+      p.vx *= 0.96; p.vy *= 0.96;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x += w; if (p.x > w) p.x -= w;
+      if (p.y < 0) p.y += h; if (p.y > h) p.y -= h;
+    }
+
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
+        const a = parts[i], b = parts[j];
+        const dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
+        if (d < 90) {
+          ctx.strokeStyle = `rgba(125,184,255,${(1 - d/90) * 0.35})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+    }
+    for (const p of parts) {
+      ctx.fillStyle = '#7db8ff';
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+</script>
+</body>
+</html>
