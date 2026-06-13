@@ -52,6 +52,7 @@ type RootConfig = {
     label: string;
     icon?: string;
     defaultOpen?: boolean;
+    children?: RawNode[];
   }>;
 };
 
@@ -142,28 +143,16 @@ export async function fetchManifest(): Promise<{
 }> {
   const config = await fetchJson<RootConfig>("config.json");
   const flat: FlatDoc[] = [];
-  const tree: DocNode[] = new Array(config.docs.length);
-  await Promise.all(
-    config.docs.map(async (entry, i) => {
-      try {
-        const dj = await fetchJson<DocJson>(`${entry.folder}/doc.json`);
-        tree[i] = {
-          kind: "section",
-          label: dj.label ?? entry.label,
-          icon: dj.icon ?? entry.icon,
-          defaultOpen: dj.defaultOpen ?? entry.defaultOpen,
-          children: attach(dj.children, entry.folder, entry.label, flat),
-        };
-      } catch (err) {
-        tree[i] = {
-          kind: "section",
-          label: `${entry.label} (failed)`,
-          children: [],
-        };
-        console.error(err);
-      }
-    }),
-  );
+  const tree: DocNode[] = config.docs.map((entry) => {
+    const children = entry.children ? attach(entry.children, entry.folder, entry.label, flat) : [];
+    return {
+      kind: "section" as const,
+      label: entry.label,
+      icon: entry.icon,
+      defaultOpen: entry.defaultOpen,
+      children,
+    };
+  });
   return { config, tree, flat };
 }
 

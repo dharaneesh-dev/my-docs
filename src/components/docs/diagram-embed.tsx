@@ -33,7 +33,7 @@ function normalizeDiagramSrc(src: string) {
 export function DiagramEmbed({
   src,
   title,
-  height = 480,
+  height = "auto",
 }: {
   src: string;
   title?: string;
@@ -43,6 +43,7 @@ export function DiagramEmbed({
   const wrapRef = useRef<HTMLDivElement>(null);
   const [srcDoc, setSrcDoc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [iframeHeight, setIframeHeight] = useState<number>(480);
   const resolvedSrc = normalizeDiagramSrc(src);
 
   // raw.githubusercontent.com serves HTML as text/plain with nosniff, so the
@@ -105,6 +106,30 @@ export function DiagramEmbed({
         },
         true,
       );
+      
+      // Dynamically adjust iframe height based on content
+      const updateHeight = () => {
+        try {
+          const body = doc.body;
+          const html = doc.documentElement;
+          const contentHeight = Math.max(
+            body.scrollHeight,
+            body.offsetHeight,
+            html.scrollHeight,
+            html.offsetHeight
+          );
+          setIframeHeight(Math.max(contentHeight, 480));
+        } catch {
+          /* cross-origin — ignore */
+        }
+      };
+      
+      updateHeight();
+      // Observe content changes
+      const resizeObserver = new ResizeObserver(updateHeight);
+      resizeObserver.observe(doc.body);
+      
+      return () => resizeObserver.disconnect();
     } catch {
       /* cross-origin — ignore */
     }
@@ -127,7 +152,7 @@ export function DiagramEmbed({
       </div>
       <div
         className="relative w-full overflow-auto bg-muted/30"
-        style={{ height: typeof height === "number" ? `${height}px` : height }}
+        style={{ height: height === "auto" ? `${iframeHeight}px` : (typeof height === "number" ? `${height}px` : height) }}
       >
         {error ? (
           <div className="flex h-full w-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
