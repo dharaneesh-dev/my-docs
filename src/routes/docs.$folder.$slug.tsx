@@ -24,7 +24,13 @@ export const Route = createFileRoute("/docs/$folder/$slug")({
     const doc = findDoc(manifest.flat, params.folder, params.slug);
     if (!doc) throw notFound();
     await context.queryClient.ensureQueryData(docQueryOptions(doc.folder, doc.file));
-    return { doc };
+    
+    // Find prev and next sequentially
+    const index = manifest.flat.findIndex((d) => d.key === `${params.folder}/${params.slug}`);
+    const prev = index > 0 ? manifest.flat[index - 1] : null;
+    const next = index < manifest.flat.length - 1 ? manifest.flat[index + 1] : null;
+    
+    return { doc, prev, next };
   },
   head: ({ loaderData, params }) => {
     const d = loaderData?.doc;
@@ -108,7 +114,7 @@ const SIDEBAR_MIN = 200;
 const SIDEBAR_MAX = 480;
 
 function DocPage() {
-  const { doc } = Route.useLoaderData();
+  const { doc, prev, next } = Route.useLoaderData();
   const [open, setOpen] = useState(false);
   const [sidebarW, setSidebarW] = useState(SIDEBAR_DEFAULT);
   const dragging = useRef(false);
@@ -231,7 +237,33 @@ function DocPage() {
               <DocBody folder={doc.folder} file={doc.file} />
             </Suspense>
 
-            <footer className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[12px] text-muted-foreground">
+            {(prev || next) && (
+              <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
+                {prev ? (
+                  <Link
+                    to="/docs/$folder/$slug"
+                    params={{ folder: prev.folder, slug: prev.slug }}
+                    className="flex w-full flex-col items-start gap-1 rounded-lg border border-border p-4 transition-colors hover:border-primary/50 hover:bg-muted/50 sm:w-1/2"
+                  >
+                    <span className="text-[11.5px] font-medium uppercase tracking-wider text-muted-foreground">Previous</span>
+                    <span className="text-[15px] font-medium text-foreground">{prev.title}</span>
+                  </Link>
+                ) : <div className="hidden sm:block sm:w-1/2" />}
+                
+                {next ? (
+                  <Link
+                    to="/docs/$folder/$slug"
+                    params={{ folder: next.folder, slug: next.slug }}
+                    className="flex w-full flex-col items-end gap-1 rounded-lg border border-border p-4 text-right transition-colors hover:border-primary/50 hover:bg-muted/50 sm:w-1/2"
+                  >
+                    <span className="text-[11.5px] font-medium uppercase tracking-wider text-muted-foreground">Next</span>
+                    <span className="text-[15px] font-medium text-foreground">{next.title}</span>
+                  </Link>
+                ) : <div className="hidden sm:block sm:w-1/2" />}
+              </div>
+            )}
+
+            <footer className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[12px] text-muted-foreground">
               <a
                 href={`https://github.com/${DOCS_REPO.owner}/${DOCS_REPO.repo}/blob/${DOCS_REPO.branch}/${DOCS_REPO.basePath ? DOCS_REPO.basePath + "/" : ""}${doc.folder}/${doc.file}`}
                 target="_blank"
