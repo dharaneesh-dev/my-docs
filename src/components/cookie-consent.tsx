@@ -47,20 +47,21 @@ export function CookieConsent() {
       }
     }
 
-    try {
-      await supabase.from("visitor_logs").insert({
-        ip_address: ip,
-        country,
-        region,
-        city,
-        user_agent: navigator.userAgent,
-        page_path: window.location.pathname + window.location.search,
-        referrer: document.referrer || null,
-        consent,
-      });
-    } catch (err) {
-      console.error("[cookie-consent] insert failed", err);
-    }
+    // Commented out: Don't write visitor logs to DB for now
+    // try {
+    //   await supabase.from("visitor_logs").insert({
+    //     ip_address: ip,
+    //     country,
+    //     region,
+    //     city,
+    //     user_agent: navigator.userAgent,
+    //     page_path: window.location.pathname + window.location.search,
+    //     referrer: document.referrer || null,
+    //     consent,
+    //   });
+    // } catch (err) {
+    //   console.error("[cookie-consent] insert failed", err);
+    // }
   };
 
   if (!open) return null;
