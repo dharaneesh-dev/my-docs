@@ -121,7 +121,7 @@ function Home() {
                       </span>
                     </div>
                     <h3 className="font-display text-[16px] font-medium leading-snug text-foreground">
-                      {d.title}
+                      {d.category}
                     </h3>
                     {d.description && (
                       <p className="text-[13px] text-muted-foreground">{d.description}</p>
