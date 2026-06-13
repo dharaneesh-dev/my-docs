@@ -121,6 +121,7 @@
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
   }
   body { font-family: var(--font-sans); }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
@@ -164,9 +165,13 @@
   & a { color: var(--color-primary); text-decoration: none; }
   & a:hover { text-decoration: underline; }
   & ul, & ol { margin: 0.5rem 0 1rem; padding-left: 1.5rem; }
-  & ul { list-style: disc; }
-  & ol { list-style: decimal; }
-  & li { margin-bottom: 0.25rem; }
+  & ul { list-style-type: disc !important; }
+  & ul ul { list-style-type: circle !important; margin-bottom: 0; }
+  & ul ul ul { list-style-type: square !important; }
+  & ol { list-style-type: decimal !important; }
+  & ol ol { list-style-type: lower-alpha !important; margin-bottom: 0; }
+  & ol ol ol { list-style-type: lower-roman !important; }
+  & li { margin-bottom: 0.25rem; display: list-item !important; }
   & li::marker { color: var(--color-muted-foreground); }
   & blockquote {
     border-left: 4px solid var(--color-primary);
@@ -176,6 +181,8 @@
     margin: 1rem 0;
     border-radius: 0 4px 4px 0;
   }
+  & blockquote > :first-child { margin-top: 0; }
+  & blockquote > :last-child { margin-bottom: 0; }
   & hr { border-color: var(--color-border); margin: 1.5rem 0; }
   & table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 13px; }
   & th, & td { border: 1px solid var(--color-border); padding: 0.5rem 0.75rem; text-align: left; }

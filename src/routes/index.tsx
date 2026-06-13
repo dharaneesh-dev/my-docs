@@ -32,7 +32,8 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data, isLoading, error } = useQuery(manifestQueryOptions);
-  const first = data?.flat[0];
+  // Use the first configDoc's first child for the "Start reading" button
+  const firstConfigDoc = data?.configDocs[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,10 +59,10 @@ function Home() {
               </figure>
 
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                {first && (
+                {firstConfigDoc && firstConfigDoc.firstSlug && (
                   <Link
                     to="/docs/$folder/$slug"
-                    params={{ folder: first.folder, slug: first.slug }}
+                    params={{ folder: firstConfigDoc.folder, slug: firstConfigDoc.firstSlug }}
                     className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition hover:opacity-90"
                   >
                     Start reading <ArrowRight className="h-3.5 w-3.5" />
@@ -103,13 +104,13 @@ function Home() {
 
           {data && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {data.flat.map((d) => {
+              {data.configDocs.map((d) => {
                 const Icon = (Icons as any)[d.icon] ?? Icons.FileText;
                 return (
                   <Link
-                    key={d.key}
+                    key={d.id}
                     to="/docs/$folder/$slug"
-                    params={{ folder: d.folder, slug: d.slug }}
+                    params={{ folder: d.folder, slug: d.firstSlug }}
                     className="card-hover group flex flex-col gap-3 rounded-lg border border-border bg-card p-5"
                   >
                     <div className="flex items-center gap-2.5">
@@ -117,14 +118,16 @@ function Home() {
                         <Icon className="h-4 w-4" />
                       </span>
                       <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                        {d.category}
+                        {d.folder.replace(/-/g, " ")}
                       </span>
                     </div>
                     <h3 className="font-display text-[16px] font-medium leading-snug text-foreground">
-                      {d.category}
+                      {d.label}
                     </h3>
                     {d.description && (
-                      <p className="text-[13px] text-muted-foreground">{d.description}</p>
+                      <p className="text-[13px] leading-relaxed text-muted-foreground">
+                        {d.description}
+                      </p>
                     )}
                     <div className="mt-auto inline-flex items-center gap-1 text-[13px] text-primary">
                       Open <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />

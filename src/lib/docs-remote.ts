@@ -51,6 +51,7 @@ type RootConfig = {
     folder: string;
     label: string;
     icon?: string;
+    description?: string;
     defaultOpen?: boolean;
   }>;
 };
@@ -84,6 +85,18 @@ export type FlatDoc = {
   category: string;
   icon: string;
   file: string;
+};
+
+/** Config-level doc entry — used by the home page cards. */
+export type ConfigDoc = {
+  id: string;
+  folder: string;
+  label: string;
+  icon: string;
+  description?: string;
+  defaultOpen?: boolean;
+  /** slug of the first child doc — used for the card link */
+  firstSlug: string;
 };
 
 /* ------------------------------------------------------------------ */
@@ -139,10 +152,12 @@ export async function fetchManifest(): Promise<{
   config: RootConfig;
   tree: DocNode[];
   flat: FlatDoc[];
+  configDocs: ConfigDoc[];
 }> {
   const config = await fetchJson<RootConfig>("config.json");
   const flat: FlatDoc[] = [];
   const tree: DocNode[] = new Array(config.docs.length);
+  const configDocs: ConfigDoc[] = [];
   
   await Promise.all(
     config.docs.map(async (entry, i) => {
@@ -155,6 +170,17 @@ export async function fetchManifest(): Promise<{
           defaultOpen: dj.defaultOpen ?? entry.defaultOpen,
           children: attach(dj.children, entry.folder, entry.label, flat),
         };
+        // Find the first doc-kind child for the redirect slug
+        const firstChild = findFirstDoc(dj.children);
+        configDocs.push({
+          id: entry.id,
+          folder: entry.folder,
+          label: entry.label,
+          icon: entry.icon ?? "FileText",
+          description: entry.description,
+          defaultOpen: entry.defaultOpen,
+          firstSlug: firstChild?.slug ?? "",
+        });
       } catch (err) {
         tree[i] = {
           kind: "section",
@@ -166,7 +192,19 @@ export async function fetchManifest(): Promise<{
     }),
   );
   
-  return { config, tree, flat };
+  return { config, tree, flat, configDocs };
+}
+
+/** Recursively find the first doc-kind node in a RawNode tree. */
+function findFirstDoc(nodes: RawNode[]): (RawNode & { kind: "doc" }) | undefined {
+  for (const n of nodes) {
+    if (n.kind === "doc") return n;
+    if (n.kind === "section") {
+      const found = findFirstDoc(n.children);
+      if (found) return found;
+    }
+  }
+  return undefined;
 }
 
 export async function fetchMarkdown(folder: string, file: string): Promise<string> {

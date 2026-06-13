@@ -34,6 +34,11 @@ function MarkdownChunk({ source }: { source: string }) {
           }
           return <CodeBlock code={text} lang={lang} />;
         },
+        table: ({ children, ...props }: any) => (
+          <div className="w-full overflow-x-auto">
+            <table {...props}>{children}</table>
+          </div>
+        ),
         pre({ children }: any) {
           return <>{children}</>;
         },

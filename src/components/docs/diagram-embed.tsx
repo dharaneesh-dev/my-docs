@@ -43,7 +43,8 @@ export function DiagramEmbed({
   const wrapRef = useRef<HTMLDivElement>(null);
   const [srcDoc, setSrcDoc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [iframeHeight, setIframeHeight] = useState<number>(480);
+  const [iframeHeight, setIframeHeight] = useState<number>(0);
+  const [iframeWidth, setIframeWidth] = useState<string>("100%");
   const resolvedSrc = normalizeDiagramSrc(src);
 
   // raw.githubusercontent.com serves HTML as text/plain with nosniff, so the
@@ -89,8 +90,11 @@ export function DiagramEmbed({
         .geDiagramContainer, .mxgraph, svg { cursor: default !important; }
         /* Hide draw.io hover tooltips / popups */
         .mxTooltip, .geTooltip, div[class*="Tooltip"],
-        .mxPopupMenu, .geMenubarContainer, .mxWindow { display: none !important; visibility: hidden !important; }
-        html, body { margin: 0; overflow: auto; }
+        /* No need to force internal scrolling anymore since the iframe expands */
+        html, body { overflow: hidden !important; }
+        /* Cosmetically hide scrollbars without clipping content */
+        * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+        *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
       `;
       doc.head.appendChild(style);
       // Neutralize click → lightbox by capturing clicks before viewer handlers fire.
@@ -106,34 +110,86 @@ export function DiagramEmbed({
         },
         true,
       );
-      
-      // Dynamically adjust iframe height based on content
-      const updateHeight = () => {
+
+      let isMeasuring = false;
+
+      // Measure content height and width by temporarily altering iframe bounds.
+      // We expand width first (to prevent text wrapping from artificially increasing height),
+      // then shrink height to measure true intrinsic height.
+      const measureSize = () => {
+        if (isMeasuring) return;
         try {
-          const body = doc.body;
-          const html = doc.documentElement;
-          const contentHeight = Math.max(
-            body.scrollHeight,
-            body.offsetHeight,
-            html.scrollHeight,
-            html.offsetHeight
-          );
-          setIframeHeight(Math.max(contentHeight, 480));
+          isMeasuring = true;
+          
+          // Force body/html to auto height so they don't fill the viewport
+          const savedBodyH = doc.body.style.height;
+          const savedHtmlH = doc.documentElement.style.height;
+          doc.body.style.height = "auto";
+          doc.documentElement.style.height = "auto";
+
+          // --- WIDTH MEASUREMENT ---
+          // Let iframe be 100% to see if content naturally overflows
+          iframe.style.width = "100%";
+          void doc.body.offsetWidth; // synchronous reflow
+          const contentWidth = doc.body.scrollWidth;
+          const clientWidth = doc.body.clientWidth;
+          
+          const finalWidth = contentWidth > clientWidth ? `${contentWidth}px` : "100%";
+          iframe.style.width = finalWidth;
+
+          // --- HEIGHT MEASUREMENT ---
+          // Shrink iframe to 10px so viewport-relative units collapse
+          iframe.style.height = "10px";
+          void doc.body.offsetHeight; // synchronous reflow
+          const contentHeight = doc.body.scrollHeight;
+
+          // Restore styles
+          doc.body.style.height = savedBodyH;
+          doc.documentElement.style.height = savedHtmlH;
+
+          if (contentHeight > 10) {
+            iframe.style.height = `${contentHeight}px`;
+            setIframeHeight(contentHeight);
+          }
+          setIframeWidth(finalWidth);
+
         } catch {
           /* cross-origin — ignore */
+        } finally {
+          // Allow observers time to ignore the immediate DOM changes we just made
+          requestAnimationFrame(() => {
+            isMeasuring = false;
+          });
         }
       };
-      
-      updateHeight();
-      // Observe content changes
-      const resizeObserver = new ResizeObserver(updateHeight);
+
+      // Content may render asynchronously (draw.io, CSS animations, etc.)
+      // Poll at increasing intervals to catch the final height.
+      const intervals = [0, 100, 300, 600, 1000, 1500, 2000, 3000, 5000];
+      const timers = intervals.map((ms) => setTimeout(measureSize, ms));
+
+      const resizeObserver = new ResizeObserver(measureSize);
       resizeObserver.observe(doc.body);
-      
-      return () => resizeObserver.disconnect();
+
+      const mutationObserver = new MutationObserver(measureSize);
+      mutationObserver.observe(doc.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
+
+      return () => {
+        timers.forEach(clearTimeout);
+        resizeObserver.disconnect();
+        mutationObserver.disconnect();
+      };
     } catch {
       /* cross-origin — ignore */
     }
   };
+
+  // Use explicit height prop as placeholder until auto-measurement kicks in
+  const initialHeight = height === "auto" ? "200px" : (typeof height === "number" ? `${height}px` : height);
 
   return (
     <figure ref={wrapRef} className="my-5 overflow-hidden rounded-md border border-border bg-background">
@@ -150,12 +206,9 @@ export function DiagramEmbed({
           <Maximize2 className="h-3 w-3" /> Fullscreen
         </button>
       </div>
-      <div
-        className="relative w-full overflow-auto bg-muted/30"
-        style={{ height: height === "auto" ? `${iframeHeight}px` : (typeof height === "number" ? `${height}px` : height) }}
-      >
+      <div className="relative w-full overflow-x-auto bg-muted/30">
         {error ? (
-          <div className="flex h-full w-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
+          <div className="flex items-center justify-center p-4 text-center text-xs text-muted-foreground">
             Failed to load diagram: {error}
           </div>
         ) : (
@@ -164,8 +217,12 @@ export function DiagramEmbed({
             srcDoc={srcDoc ?? "<!doctype html><html><body style=\"margin:0\"></body></html>"}
             title={title ?? "Diagram"}
             onLoad={handleLoad}
-            className="block h-full w-full"
-            sandbox="allow-scripts"
+            className="block border-0"
+            style={{ 
+              height: iframeHeight > 0 ? `${iframeHeight}px` : initialHeight,
+              width: iframeWidth,
+            }}
+            sandbox="allow-scripts allow-same-origin"
             loading="lazy"
           />
         )}
@@ -173,3 +230,4 @@ export function DiagramEmbed({
     </figure>
   );
 }
+
