@@ -6,6 +6,7 @@ import {
   DiagramBlock,
   Pitfall,
   CodeExample,
+  Derivation,
 } from "@/components/docs/lesson-blocks";
 import { Formula } from "@/components/docs/formula";
 import { DiagramHost } from "./diagram-host";
@@ -52,6 +53,38 @@ export function GeneralizedEigenvalues() {
           section 1.6 — the generalized version is a strict superset, not a different topic.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: reducing Av = λBv to an ordinary eigenvalue problem"
+      >
+        <p>
+          When B is symmetric positive definite (the usual ML case), Cholesky-factor it (section
+          1.14) as <code>B = LLᵀ</code>. Substitute into the generalized problem and insert{" "}
+          <code>L⁻ᵀLᵀ = I</code> in a useful spot:
+        </p>
+        <Formula>
+          {"Av = \\lambda LL^Tv \\quad\\Longrightarrow\\quad L^{-1}Av = \\lambda L^Tv"}
+        </Formula>
+        <p>
+          Now define the change of variables <code>y = Lᵀv</code>, so <code>v = L⁻ᵀy</code>, and
+          substitute on the left:
+        </p>
+        <Formula>{"L^{-1}A L^{-T} y = \\lambda y"}</Formula>
+        <p>
+          This is now an <em>ordinary</em> eigenvalue problem (section 1.6) for the matrix{" "}
+          <code>C = L⁻¹AL⁻ᵀ</code>, with the exact same eigenvalues <code>λ</code> as the original
+          generalized problem — and if A is symmetric, C is symmetric too, so a standard symmetric
+          eigensolver applies directly. The original eigenvectors are recovered via{" "}
+          <code>v = L⁻ᵀy</code>. This is precisely the reduction production solvers use internally,
+          which is why calling a dedicated generalized eigensolver is both correct and no more
+          expensive than doing this transformation by hand.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this exact Cholesky-based reduction is what LDA and CCA solvers do
+          internally, and it's also the standard way vibration analysis software solves{" "}
+          <code>Kv = λMv</code> for a structure's natural frequencies and mode shapes.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="LDA: find the projection that best separates two classes"
@@ -174,6 +207,39 @@ export function RandomizedLinearAlgebra() {
           at a fraction of the cost of factoring A directly.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: why a random sketch captures A's range (the exact-rank case)"
+      >
+        <p>
+          Suppose A truly has rank <code>k</code> (only k independent directions in its column
+          space) and you sketch it with a random <code>Ω</code> of exactly <code>k</code> columns:{" "}
+          <code>Y = AΩ</code>. Write A's compact SVD as <code>A = UΣVᵀ</code> with{" "}
+          <code>U, Σ, V</code> all of rank <code>k</code>. Then:
+        </p>
+        <Formula>{"Y = A\\Omega = U\\Sigma V^T\\Omega = U(\\Sigma V^T\\Omega)"}</Formula>
+        <p>
+          The parenthesized term <code>ΣVᵀΩ</code> is a <code>k×k</code> matrix. Since{" "}
+          <code>Ω</code> is random (its columns aren't specially aligned to anything), this{" "}
+          <code>k×k</code> matrix is invertible with probability 1 — random matrices are singular
+          only on a measure-zero set of unlucky draws. So <code>Y</code> equals <code>U</code> times
+          an invertible <code>k×k</code> matrix, which means <code>Y</code>'s columns span exactly
+          the same <code>k</code>-dimensional space as <code>U</code>'s — i.e., exactly A's column
+          space, recovered from a matrix <code>k</code> columns wide instead of A's original width.
+          When A is only
+          <em> approximately</em> low-rank (the realistic case — singular values decay but never hit
+          exactly zero), this argument degrades gracefully rather than breaking outright: the sketch
+          captures the dominant directions well and the small residual is proportional to the
+          singular values being discarded, which is why fast-decaying spectra sketch so well in
+          practice.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this is the exact justification behind{" "}
+          <code>sklearn.decomposition.TruncatedSVD</code> and randomized PCA — the random sketch
+          isn't a heuristic approximation of a vague notion, it's provably recovering A's dominant
+          subspace with a concrete, computable failure probability.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Random projections roughly preserve pairwise distance"
@@ -306,6 +372,48 @@ export function NonNegativeMatrixFactorization() {
           how it must be solved.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: why the multiplicative update rule preserves non-negativity"
+      >
+        <p>
+          Minimizing <code>‖A − WH‖²_F</code> by ordinary gradient descent (section 1.16) on W would
+          use <code>W ← W − η·∇_W</code>, where the gradient is <code>∇_W = 2(WH − A)Hᵀ</code>.
+          Nothing in that update prevents entries of W from going negative — a generic step size can
+          easily overshoot past zero.
+        </p>
+        <p>
+          Lee and Seung's trick is to choose the step size <code>η</code> itself, separately for
+          every entry, so it exactly cancels the negative part of the gradient. Split the gradient
+          into its two non-negative pieces, <code>∇_W = 2(WHHᵀ) − 2(AHᵀ)</code>, and set the
+          per-entry step size to{" "}
+          <code>
+            η_{"{ij}"} = W_{"{ij}"} / (WHH^T)_{"{ij}"}
+          </code>
+          :
+        </p>
+        <Formula>
+          {
+            "W_{ij} \\leftarrow W_{ij} - \\frac{W_{ij}}{(WHH^T)_{ij}}\\Big(2(WHH^T)_{ij} - 2(AH^T)_{ij}\\Big) = W_{ij}\\frac{(AH^T)_{ij}}{(WHH^T)_{ij}}"
+          }
+        </Formula>
+        <p>
+          Every quantity on the right — <code>W</code>, <code>A</code>, <code>H</code> — is
+          non-negative by assumption, and a ratio of non-negative numbers is non-negative. So{" "}
+          <code>W</code> can shrink toward zero but can never cross it, and the same construction
+          applied to <code>H</code> gives an equally safe multiplicative update. This is exactly why
+          NMF solvers use this specific, seemingly ad-hoc update rule instead of plain gradient
+          descent — it's the one choice of step size that makes non-negativity automatic rather than
+          something that needs a separate projection or constraint step.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this is literally the default solver inside{" "}
+          <code>sklearn.decomposition.NMF</code> (<code>solver='mu'</code>), and the same "adaptive
+          step size cancels the negative part of the gradient" trick reappears in other
+          constrained-optimization corners of ML wherever a variable must be kept non-negative
+          throughout training.
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           A tiny document-term matrix (rows = documents, columns = words, entries = word counts)
@@ -434,6 +542,38 @@ export function HessianVectorProducts() {
           total, no matrix ever explicitly formed.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: why Hv = ∇(∇f · v)">
+        <p>
+          Write the gradient as a vector-valued function <code>g(x) = ∇f(x)</code>, with components{" "}
+          <code>g_i(x) = ∂f/∂x_i</code>. The Hessian is by definition the Jacobian of g:{" "}
+          <code>H_{"{ij}"} = ∂g_i/∂x_j</code>. Now consider the scalar function{" "}
+          <code>φ(x) = g(x)·v = Σᵢ g_i(x)vᵢ</code> for a fixed constant vector v, and differentiate
+          it with respect to <code>xⱼ</code>, using that v doesn't depend on x:
+        </p>
+        <Formula>
+          {
+            "\\frac{\\partial \\phi}{\\partial x_j} = \\sum_i \\frac{\\partial g_i}{\\partial x_j}v_i = \\sum_i H_{ji}v_i = (Hv)_j"
+          }
+        </Formula>
+        <p>
+          (using that H is symmetric for a twice-differentiable f, so{" "}
+          <code>
+            H_{"{ji}"} = H_{"{ij}"}
+          </code>
+          ). So the j-th component of <code>∇φ</code> is exactly the j-th component of{" "}
+          <code>Hv</code> — meaning <code>∇φ = Hv</code> for every component simultaneously, which
+          is the identity used above. Nothing here required ever writing down H itself; the
+          derivation only ever manipulated the scalar function <code>φ = ∇f · v</code>, which is
+          exactly why two ordinary backward passes suffice.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: any second-order optimizer, curvature diagnostic, or
+          influence-function computation that needs "Hessian times a vector" rather than the full
+          Hessian relies on exactly this identity — it's the mathematical fact, not just an
+          implementation trick, that makes second-order information tractable for million-parameter
+          models.
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           For <code>f(x, y) = x²y + y³</code>, the true Hessian is{" "}
@@ -551,6 +691,45 @@ export function OrthogonalProcrustes() {
           }
         </Formula>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: why R* = VUᵀ solves the Procrustes problem">
+        <p>
+          Minimizing <code>‖AR − B‖²_F</code> over rotations R is equivalent to maximizing a simpler
+          quantity. Expand the squared Frobenius norm using <code>‖X‖²_F = trace(XᵀX)</code>{" "}
+          (section 1.19):
+        </p>
+        <Formula>
+          {
+            "\\|AR-B\\|_F^2 = \\text{trace}(R^TA^TAR) - 2\\,\\text{trace}(R^TA^TB) + \\text{trace}(B^TB)"
+          }
+        </Formula>
+        <p>
+          The first term equals <code>trace(AᵀA)</code> by the cyclic property (section 1.22) since{" "}
+          <code>RᵀR = I</code>, and the last term doesn't involve R at all — so minimizing the whole
+          expression over R is exactly equivalent to <em>maximizing</em>{" "}
+          <code>trace(RᵀAᵀB) = trace(RᵀM)</code> where <code>M = AᵀB = UΣVᵀ</code>. Substitute the
+          SVD and use cyclic invariance again:
+        </p>
+        <Formula>
+          {
+            "\\text{trace}(R^TU\\Sigma V^T) = \\text{trace}(V^TR^TU\\Sigma) = \\text{trace}(Z\\Sigma), \\quad Z = V^TR^TU"
+          }
+        </Formula>
+        <p>
+          Z is a product of orthogonal matrices, so it's orthogonal too, meaning every entry of Z
+          satisfies <code>|Z_{"{ii}"}| ≤ 1</code>. Since Σ has non-negative diagonal entries,{" "}
+          <code>trace(ZΣ) = Σᵢ Z_{"{ii}"}σᵢ</code> is maximized exactly when every{" "}
+          <code>Z_{"{ii}"} = 1</code>, i.e. when <code>Z = I</code>. Solving <code>VᵀRᵀU = I</code>{" "}
+          for R gives <code>R = VUᵀ</code> — the closed form, derived entirely from properties of
+          trace and orthogonal matrices already covered in this chapter, with no iterative search
+          required.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: every cross-lingual embedding alignment pipeline and
+          shape-registration tool that calls this a "one-line SVD solution" is relying on exactly
+          this proof — it's also why the reflection-vs-rotation subtlety noted below is unavoidable:
+          the proof only ever concluded Z = I, not that <code>det(R) = +1</code>.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Aligning a rotated shape back onto its target"
@@ -672,6 +851,43 @@ export function ConjugateGradientMethod() {
           iteration, never a full matrix inversion or decomposition.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: the optimal step size along a conjugate direction"
+      >
+        <p>
+          Solving <code>Ax = b</code> for symmetric positive-definite A is equivalent to minimizing
+          the quadratic form <code>φ(x) = ½xᵀAx − bᵀx</code> (section 1.15), since its gradient{" "}
+          <code>∇φ(x) = Ax − b</code> is exactly the residual, zero precisely at the solution. Given
+          a current point <code>xₖ</code> and search direction <code>dₖ</code>, an exact line search
+          picks the step size <code>αₖ</code> that minimizes <code>φ(xₖ + αdₖ)</code> along that one
+          direction. Expand and differentiate with respect to α, then set to zero:
+        </p>
+        <Formula>
+          {
+            "\\frac{d}{d\\alpha}\\phi(x_k+\\alpha d_k) = d_k^T(A(x_k+\\alpha d_k) - b) = d_k^Tr_k + \\alpha d_k^TAd_k = 0"
+          }
+        </Formula>
+        <p>
+          where <code>rₖ = Axₖ − b</code> is the current residual. Solving for α:
+        </p>
+        <Formula>
+          {"\\alpha_k = -\\frac{d_k^Tr_k}{d_k^TAd_k} = \\frac{r_k^Tr_k}{d_k^TAd_k}"}
+        </Formula>
+        <p>
+          (the last simplification uses that <code>dₖ</code> is built to equal <code>−rₖ</code> plus
+          a component along previous, A-conjugate directions, which vanishes against <code>rₖ</code>{" "}
+          by the conjugacy property itself). This is exactly the <code>alpha</code> line in the code
+          below — not a heuristic, but the exact 1D minimizer along the current search direction,
+          which is precisely why each CG step never needs to backtrack or retry: it's already
+          optimal for that direction by construction.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this exact-line-search argument is what distinguishes CG from generic
+          gradient descent with a guessed learning rate — every step size in CG is derived, not
+          tuned, which is a large part of why it needs no hyperparameter search to work well.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Conjugate gradient vs. plain gradient descent, on the same stretched bowl"
@@ -813,6 +1029,42 @@ export function TriangularJacobiansFlows() {
           1.12's observation about triangular matrices.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: the change-of-variables formula for probability densities"
+      >
+        <p>
+          Let <code>z = f(x)</code> be an invertible, differentiable transformation, with{" "}
+          <code>z</code> distributed according to a known simple density <code>p_Z</code>. For any
+          small region <code>dx</code> around a point x, the transformed region has volume{" "}
+          <code>|det J_f(x)|·dx</code> (section 1.11's geometric meaning of the determinant — it's
+          exactly the local volume-scaling factor of the map). Conservation of total probability
+          requires the probability mass in the two corresponding regions to match exactly:
+        </p>
+        <Formula>{"p_X(x)\\,dx = p_Z(f(x))\\,\\big|\\det J_f(x)\\big|\\,dx"}</Formula>
+        <p>
+          Cancel the shared infinitesimal volume element <code>dx</code> from both sides and take
+          logs:
+        </p>
+        <Formula>
+          {
+            "p_X(x) = p_Z(f(x))\\,|\\det J_f(x)| \\;\\Longrightarrow\\; \\log p_X(x) = \\log p_Z(f(x)) + \\log|\\det J_f(x)|"
+          }
+        </Formula>
+        <p>
+          This is exactly the formula stated above, and it makes clear why the determinant term
+          isn't optional or a correction factor — it's the exact bookkeeping needed to keep{" "}
+          <code>p_X</code> a valid density (integrating to 1) after a change of coordinates that
+          locally stretches or shrinks volume by a different amount at every point.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this is the training objective itself for every normalizing flow model
+          — maximizing <code>log p_X(x)</code> on real data requires evaluating exactly this formula
+          for every training example, which is precisely why the triangular-Jacobian architectural
+          trick (making the determinant cheap) is not an optimization but a hard requirement for the
+          model to be trainable at all.
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           A simple "coupling layer" (the building block of RealNVP) splits the input into two

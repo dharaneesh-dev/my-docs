@@ -98,6 +98,29 @@ export function CodeExample({
   );
 }
 
+export function Derivation({
+  id,
+  title,
+  children,
+}: {
+  id?: string;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      id={id}
+      data-toc-label={id ? title : undefined}
+      className="prose-docs my-4 max-w-[760px] scroll-mt-20 rounded-lg border border-violet-500/30 bg-violet-500/5 p-5"
+    >
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export function Takeaway({ children }: { children: ReactNode }) {
   return (
     <div className="prose-docs my-5 max-w-[760px] rounded-r-lg border-l-4 border-primary bg-primary/10 py-3 pl-4 pr-4">

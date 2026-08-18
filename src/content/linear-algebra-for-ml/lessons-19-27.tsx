@@ -6,6 +6,7 @@ import {
   DiagramBlock,
   Pitfall,
   CodeExample,
+  Derivation,
 } from "@/components/docs/lesson-blocks";
 import { Formula } from "@/components/docs/formula";
 import { DiagramHost } from "./diagram-host";
@@ -55,6 +56,36 @@ export function MatrixNorms() {
           norm when applied to a matrix with only one column.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: ‖A‖₂ ≤ ‖A‖_F ≤ ‖A‖*">
+        <p>
+          All three norms are built from the same list of non-negative singular values{" "}
+          <code>σ₁ ≥ σ₂ ≥ ⋯ ≥ σᵣ ≥ 0</code>. The spectral norm is just the largest one,{" "}
+          <code>σ₁</code>. The Frobenius norm squares and sums all of them:
+        </p>
+        <Formula>{"\\|A\\|_F^2 = \\sum_i \\sigma_i^2 \\ge \\sigma_1^2 = \\|A\\|_2^2"}</Formula>
+        <p>
+          — true because every term in the sum is non-negative, so dropping all but the largest can
+          only decrease the total. Taking square roots preserves the inequality, giving the first
+          half.
+        </p>
+        <p>For the second half, square the nuclear norm directly:</p>
+        <Formula>
+          {
+            "\\|A\\|_*^2 = \\left(\\sum_i \\sigma_i\\right)^2 = \\sum_i \\sigma_i^2 + \\sum_{i\\ne j}\\sigma_i\\sigma_j \\ge \\sum_i \\sigma_i^2 = \\|A\\|_F^2"
+          }
+        </Formula>
+        <p>
+          — the cross terms <code>σᵢσⱼ</code> are all non-negative (singular values are never
+          negative), so the squared nuclear norm can only be larger than or equal to the squared
+          Frobenius norm. Square-rooting both sides gives <code>‖A‖_F ≤ ‖A‖*</code>.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> this ordering is exactly why nuclear-norm
+          regularization (used for low-rank matrix completion) is always at least as "strong" a
+          penalty as Frobenius-norm weight decay for the same matrix — it never under-penalizes
+          relative to the simpler norm.
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           For <code>A = [[3, 0], [4, 5]]</code>, the Frobenius norm is the easiest to check by hand:{" "}
@@ -179,6 +210,32 @@ export function NumericalStability() {
           <code>NaN</code>.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: why subtracting the max changes nothing">
+        <p>Start from the plain definition and factor out a constant from every exponential:</p>
+        <Formula>{"e^{x_i - m} = e^{x_i}\\,e^{-m}"}</Formula>
+        <p>Substitute this into both the numerator and every term of the denominator's sum:</p>
+        <Formula>
+          {
+            "\\frac{e^{x_i-m}}{\\sum_j e^{x_j-m}} = \\frac{e^{x_i}e^{-m}}{\\sum_j e^{x_j}e^{-m}} = \\frac{e^{-m}\\,e^{x_i}}{e^{-m}\\sum_j e^{x_j}}"
+          }
+        </Formula>
+        <p>
+          The <code>e⁻ᵐ</code> factor is identical in every term of the sum, so it can be pulled
+          outside — and then it cancels exactly between numerator and denominator, leaving the
+          original, unshifted softmax formula untouched:
+        </p>
+        <Formula>{"= \\frac{e^{x_i}}{\\sum_j e^{x_j}} = \\text{softmax}(x_i)"}</Formula>
+        <p>
+          The shift by m is therefore a pure identity, true for <em>any</em> choice of m — choosing{" "}
+          <code>m = max(x)</code> specifically is what keeps every exponent computed{" "}
+          <code>≤ 0</code>, so the largest term is <code>e⁰ = 1</code> and nothing can overflow.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> this exact algebraic cancellation is why every
+          framework's built-in <code>log_softmax</code>/<code>cross_entropy</code> function is safe
+          to call on raw, unbounded network outputs (logits) without any manual pre-scaling.
+        </p>
+      </Derivation>
       <CodeExample
         id="practical"
         title="Practical example — softmax done wrong, then done right"
@@ -303,6 +360,31 @@ export function SparseMatrices() {
           pattern.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: the sparse storage breakeven point">
+        <p>
+          Dense storage always costs <code>mn</code> numbers, no matter how many entries are zero.
+          COO storage costs about <code>3k</code> numbers, where <code>k</code> is the number of
+          non-zero entries (one value plus a row index and a column index per entry). Sparse storage
+          is worth it exactly when it uses less memory than dense storage:
+        </p>
+        <Formula>{"3k < mn \\quad\\Longleftrightarrow\\quad k < \\frac{mn}{3}"}</Formula>
+        <p>
+          So the breakeven density is <code>1/3</code> — if fewer than a third of the entries are
+          non-zero, COO already wins on raw memory, and formats like CSR (which drop the redundant
+          row index down to one integer per row instead of per entry) push that breakeven point even
+          lower, often to a few percent density in practice for large matrices. This is why "sparse"
+          in ML code doesn't mean "mostly zero" in some vague sense — it means the actual non-zero
+          fraction has crossed a concrete, computable threshold below which switching formats is a
+          strict win.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: recommender-system interaction matrices (user × item, almost always
+          &lt;1% dense), sparse feature encodings (one-hot / bag-of-words text features), graph
+          adjacency matrices for large graphs, and sparse gradients in embedding-table training — in
+          every case the memory and compute savings from picking the right sparse format are the
+          difference between an algorithm running on one machine and needing a cluster.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Dense vs. sparse storage, computed live"
@@ -416,6 +498,39 @@ export function TraceOfAMatrix() {
           }
         </Formula>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: proof of the cyclic property trace(AB) = trace(BA)"
+      >
+        <p>
+          Let <code>A</code> be <code>m×n</code> and <code>B</code> be <code>n×m</code>, so both{" "}
+          <code>AB</code> (<code>m×m</code>) and <code>BA</code> (<code>n×n</code>) are square and
+          have well-defined traces. Write out the diagonal entry of <code>AB</code> at row{" "}
+          <code>i</code>, then sum over <code>i</code>:
+        </p>
+        <Formula>
+          {
+            "\\text{trace}(AB) = \\sum_{i} (AB)_{ii} = \\sum_i \\sum_j A_{ij}B_{ji} = \\sum_j \\sum_i B_{ji}A_{ij} = \\sum_j (BA)_{jj} = \\text{trace}(BA)"
+          }
+        </Formula>
+        <p>
+          The entire proof is just swapping the order of a double sum — nothing about matrix
+          multiplication's non-commutativity is violated, because <code>trace(AB)</code> and{" "}
+          <code>trace(BA)</code> are scalars built from the exact same set of products{" "}
+          <code>
+            A_{"{ij}"}B_{"{ji}"}
+          </code>
+          , just added up in a different grouping. The general cyclic property{" "}
+          <code>trace(ABC) = trace(BCA) = trace(CAB)</code> follows by treating <code>BC</code> as a
+          single matrix and applying this two-matrix result once.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this exact swap-the-sum trick is the standard way to derive gradients
+          of scalar loss functions with respect to matrices (section 1.16) — rewriting{" "}
+          <code>xᵀAx</code> as <code>trace(Axxᵀ)</code> converts an expression that's awkward to
+          differentiate directly into one with a known matrix-derivative identity.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Only the diagonal matters"
@@ -521,6 +636,43 @@ export function PowerIteration() {
           {"v_{k+1} = \\frac{Av_k}{\\|Av_k\\|} \\qquad \\lambda \\approx \\frac{v^TAv}{v^Tv}"}
         </Formula>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: why power iteration converges to the dominant eigenvector"
+      >
+        <p>
+          Suppose <code>A</code> is symmetric with orthonormal eigenvectors{" "}
+          <code>u₁, u₂, …, uₙ</code> and eigenvalues <code>|λ₁| &gt; |λ₂| ≥ ⋯ ≥ |λₙ|</code> (a
+          strictly dominant top eigenvalue). Any starting vector can be written in this eigenbasis
+          as <code>v₀ = c₁u₁ + c₂u₂ + ⋯ + cₙuₙ</code>. Applying <code>A</code> is easy in this
+          basis, since <code>Auᵢ = λᵢuᵢ</code>:
+        </p>
+        <Formula>
+          {"A^k v_0 = c_1\\lambda_1^k u_1 + c_2\\lambda_2^k u_2 + \\cdots + c_n\\lambda_n^k u_n"}
+        </Formula>
+        <p>
+          Factor out the dominant term <code>λ₁ᵏ</code>:
+        </p>
+        <Formula>
+          {
+            "A^k v_0 = \\lambda_1^k\\left(c_1 u_1 + c_2\\left(\\frac{\\lambda_2}{\\lambda_1}\\right)^k u_2 + \\cdots\\right)"
+          }
+        </Formula>
+        <p>
+          Since <code>|λ₂/λ₁| &lt; 1</code>, every term but the first shrinks geometrically to zero
+          as <code>k → ∞</code>. After normalizing away the diverging or vanishing scale factor{" "}
+          <code>λ₁ᵏ</code>, all that survives is the direction of <code>u₁</code> — exactly the
+          dominant eigenvector, and the rate of convergence is governed by the ratio{" "}
+          <code>|λ₂/λ₁|</code>: the further apart the top two eigenvalues are, the faster power
+          iteration locks on.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this convergence argument is exactly why PageRank (section 1.27)
+          reliably converges regardless of the enormous size of the web graph, and why the
+          convergence can stall badly on graphs where the top two eigenvalues happen to be close
+          together (a known practical failure mode of naive power iteration).
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Watch a vector converge onto the dominant eigenvector"
@@ -642,6 +794,33 @@ export function KernelMethods() {
           compute coordinates for directly, but can still use freely via the kernel trick.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: the quadratic kernel trick, worked concretely">
+        <p>
+          Take 2D inputs <code>x = (x₁, x₂)</code> and the quadratic lift{" "}
+          <code>φ(x) = (x₁², √2 x₁x₂, x₂²)</code> into 3D. Computing the dot product after lifting
+          both points looks expensive — three multiplications in the lifted space:
+        </p>
+        <Formula>{"\\phi(x)\\cdot\\phi(y) = x_1^2y_1^2 + 2x_1x_2y_1y_2 + x_2^2y_2^2"}</Formula>
+        <p>But the right-hand side is exactly a perfect square in the original coordinates:</p>
+        <Formula>
+          {"x_1^2y_1^2 + 2x_1x_2y_1y_2 + x_2^2y_2^2 = (x_1y_1 + x_2y_2)^2 = (x\\cdot y)^2"}
+        </Formula>
+        <p>
+          So <code>k(x, y) = (x·y)²</code> — one multiplication and one squaring in the original 2D
+          space — gives <em>exactly</em> the same number as lifting to 3D and taking the dot product
+          there. Nobody ever needs to build the 3-coordinate vector. This is the entire kernel
+          trick, made concrete for one specific case; the RBF kernel above is the same idea taken to
+          an infinite-dimensional lift, where writing out φ explicitly isn't even possible but the
+          kernel function itself is still just one exponential to evaluate.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: kernel SVMs, kernel PCA, kernel ridge regression, and Gaussian process
+          regression all use this exact substitution — replace every dot product in an algorithm
+          with a kernel evaluation, and the algorithm behaves as if it were run in a (possibly
+          infinite-dimensional) lifted space, at the computational cost of the original
+          low-dimensional one.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Not separable → separable, via an implicit lift"
@@ -761,6 +940,44 @@ export function Whitening() {
           direct, practical use of the material from section 1.6.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: whitening really does produce identity covariance"
+      >
+        <p>
+          Let <code>Σ = VΛVᵀ</code> be the eigendecomposition of the (symmetric, PSD) covariance
+          matrix, and define <code>y = Σ⁻¹ᐟ²(x − μ) = VΛ⁻¹ᐟ²Vᵀ(x − μ)</code>. Compute the covariance
+          of the transformed variable <code>y</code> directly from the definition, using that
+          covariance transforms as <code>Cov(Mx) = M·Cov(x)·Mᵀ</code> for any constant matrix{" "}
+          <code>M</code>:
+        </p>
+        <Formula>
+          {
+            "\\text{Cov}(y) = \\Sigma^{-1/2}\\,\\Sigma\\,\\Sigma^{-1/2} = V\\Lambda^{-1/2}V^T \\cdot V\\Lambda V^T \\cdot V\\Lambda^{-1/2}V^T"
+          }
+        </Formula>
+        <p>
+          Since <code>VᵀV = I</code> (V is orthogonal), every adjacent <code>VᵀV</code> pair
+          collapses, leaving purely diagonal matrices multiplying each other:
+        </p>
+        <Formula>
+          {"\\text{Cov}(y) = V\\left(\\Lambda^{-1/2}\\Lambda\\Lambda^{-1/2}\\right)V^T = VIV^T = I"}
+        </Formula>
+        <p>
+          The middle diagonal product is literally <code>λᵢ⁻¹ᐟ² · λᵢ · λᵢ⁻¹ᐟ² = 1</code> for every
+          eigenvalue, so it's exactly the identity matrix, and <code>VIVᵀ = I</code> too. That's the
+          algebraic guarantee, not just a visual impression from the diagram: after this transform,
+          every direction has variance exactly 1 and every pair of directions has covariance exactly
+          0.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: whitening as a preprocessing step before k-means or nearest-neighbor
+          search (both of which implicitly assume all directions are equally scaled), ZCA whitening
+          in classic image-preprocessing pipelines, and as a component inside independent component
+          analysis (ICA), which requires whitened input before it can separate independent signal
+          sources.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Correlated, stretched data → isotropic unit-variance cloud"
@@ -879,6 +1096,44 @@ export function WoodburyIdentity() {
           instead of a full n×n one.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: verifying the Woodbury identity by direct multiplication"
+      >
+        <p>
+          The cleanest proof of a claimed inverse formula is to just multiply it by the original
+          matrix and check the result is the identity. Let{" "}
+          <code>B = A⁻¹ − A⁻¹U(C⁻¹ + VA⁻¹U)⁻¹VA⁻¹</code> be the claimed inverse of{" "}
+          <code>(A + UCV)</code>. Multiply them together and distribute:
+        </p>
+        <Formula>
+          {
+            "(A+UCV)B = I - U(C^{-1}+VA^{-1}U)^{-1}VA^{-1} + UCVA^{-1} - UCVA^{-1}U(C^{-1}+VA^{-1}U)^{-1}VA^{-1}"
+          }
+        </Formula>
+        <p>
+          Group the last three terms, all of which share a common right-hand factor of{" "}
+          <code>(C⁻¹ + VA⁻¹U)⁻¹VA⁻¹</code> once <code>UCVA⁻¹</code> is rewritten as{" "}
+          <code>UC(C⁻¹ + VA⁻¹U)(C⁻¹ + VA⁻¹U)⁻¹VA⁻¹</code>:
+        </p>
+        <Formula>
+          {
+            "U\\Big[C(C^{-1}+VA^{-1}U) - I - CVA^{-1}U\\Big](C^{-1}+VA^{-1}U)^{-1}VA^{-1} = U\\Big[CC^{-1} - I\\Big](\\cdots) = 0"
+          }
+        </Formula>
+        <p>
+          The bracket is exactly <code>CC⁻¹ − I = 0</code>, so everything past the leading{" "}
+          <code>I</code> vanishes and <code>(A + UCV)B = I</code> — confirming <code>B</code> really
+          is the inverse, purely by algebra, with no assumption needed beyond the relevant inverses
+          existing.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: recursive least squares and Kalman filters (an O(n³) covariance
+          re-inversion at every timestep would make real-time filtering infeasible), Gaussian
+          process regression when adding one new observation, and low-rank adaptation (LoRA) style
+          updates to large weight matrices in deep learning.
+        </p>
+      </Derivation>
       <SectionBlock
         id="worked"
         label="Worked example (Sherman-Morrison, the rank-1 case)"
@@ -1020,6 +1275,48 @@ export function PerronFrobenius() {
           pair is also unique.
         </p>
       </SectionBlock>
+      <Derivation
+        id="derivation"
+        title="Derivation: a column-stochastic matrix always has dominant eigenvalue 1"
+      >
+        <p>
+          The full Perron-Frobenius theorem needs real analysis to prove in general, but the
+          specific fact PageRank relies on — that the dominant eigenvalue is exactly <code>1</code>,
+          not just "some positive number" — has a short, fully elementary proof for the
+          column-stochastic matrices PageRank actually uses (every column sums to 1, since it
+          distributes one page's importance across its outgoing links).
+        </p>
+        <p>
+          First, <code>λ = 1</code> is always an eigenvalue: let <code>𝟙</code> be the all-ones row
+          vector. Since every column of <code>A</code> sums to 1, <code>𝟙A = 𝟙</code> exactly — so{" "}
+          <code>𝟙</code> is a left eigenvector of <code>A</code> with eigenvalue 1.
+        </p>
+        <p>
+          Second, no eigenvalue can exceed 1 in magnitude: let <code>v</code> be any eigenvector
+          with <code>Av = λv</code>, and let <code>i</code> be the index where <code>|vᵢ|</code> is
+          largest. Looking at row <code>i</code> of <code>Av = λv</code>:
+        </p>
+        <Formula>
+          {
+            "|\\lambda||v_i| = \\Big|\\sum_j A_{ij}v_j\\Big| \\le \\sum_j A_{ij}|v_j| \\le |v_i|\\sum_j A_{ij}"
+          }
+        </Formula>
+        <p>
+          This uses only the triangle inequality and that <code>|vⱼ| ≤ |vᵢ|</code> for every{" "}
+          <code>j</code> by choice of <code>i</code>. Dividing both sides by <code>|vᵢ|</code> gives{" "}
+          <code>|λ| ≤ Σⱼ A_{"{ij}"}</code>, a row sum — and while PageRank's matrix is
+          column-stochastic rather than row-stochastic, the same argument applied to <code>Aᵀ</code>{" "}
+          (which shares A's eigenvalues) shows <code>|λ| ≤ 1</code> for every eigenvalue. Combined
+          with the first half, <code>λ = 1</code> is not just an eigenvalue — it is the dominant
+          one.
+        </p>
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          Where this is used: this is precisely why the PageRank power iteration is guaranteed to
+          converge to a fixed, positive, interpretable "importance score" vector rather than blowing
+          up or decaying to zero — the normalization built into the column-stochastic transition
+          matrix pins the dominant eigenvalue at exactly 1 by construction.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="PageRank as power iteration on a link graph"

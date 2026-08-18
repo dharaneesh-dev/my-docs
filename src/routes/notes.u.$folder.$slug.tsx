@@ -19,17 +19,16 @@ export const Route = createFileRoute("/notes/u/$folder/$slug")({
     const chapter = getChapter(params.folder);
     const lesson = chapter && getLesson(params.folder, params.slug);
     if (!chapter || !lesson) throw notFound();
-    // Disabled content still resolves (so toggling `enabled: false` shows a friendly
-    // notice instead of turning the URL into a 404), but never appears in prev/next.
-    const list = enabledLessons(chapter);
-    const idx = list.findIndex((l) => l.slug === params.slug);
-    const prev = idx > 0 ? list[idx - 1] : null;
-    const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
+    // Only serializable data goes through loader data — the chapter/lesson objects hold a
+    // `Component` function reference, which cannot be serialized for SSR hydration (this was
+    // the cause of a blank page on hard refresh). The component re-derives everything else
+    // straight from params via the same (cheap, synchronous, server/client-identical) registry
+    // lookups instead.
     const disabled = !isChapterEnabled(chapter) || !isLessonEnabled(lesson);
-    return { chapter, lesson, prev, next, disabled };
+    return { disabled };
   },
-  head: ({ loaderData, params }) => {
-    const lesson = loaderData?.lesson;
+  head: ({ params }) => {
+    const lesson = getLesson(params.folder, params.slug);
     const title = lesson ? `${lesson.title} — Knowledge Base` : "Docs";
     const desc = lesson?.description ?? "Documentation — engineering notes by Dharaneesh Boobalan.";
     const url = `https://docs.dharaneesh.in/notes/u/${params.folder}/${params.slug}`;
@@ -69,7 +68,15 @@ const SIDEBAR_MIN = 200;
 const SIDEBAR_MAX = 480;
 
 function DocPage() {
-  const { chapter, lesson, prev, next, disabled } = Route.useLoaderData();
+  const { folder, slug } = Route.useParams();
+  const { disabled } = Route.useLoaderData();
+  // Re-derived directly from params (not loader data) — see the loader comment above.
+  const chapter = getChapter(folder)!;
+  const lesson = getLesson(folder, slug)!;
+  const list = enabledLessons(chapter);
+  const idx = list.findIndex((l) => l.slug === slug);
+  const prev = idx > 0 ? list[idx - 1] : null;
+  const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
   const [open, setOpen] = useState(false);
   const [sidebarW, setSidebarW] = useState(SIDEBAR_DEFAULT);
   const [toc, setToc] = useState<TocItem[]>([]);

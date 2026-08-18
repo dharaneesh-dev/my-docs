@@ -6,6 +6,7 @@ import {
   DiagramBlock,
   Pitfall,
   CodeExample,
+  Derivation,
 } from "@/components/docs/lesson-blocks";
 import { Formula } from "@/components/docs/formula";
 import { DiagramHost } from "./diagram-host";
@@ -63,6 +64,33 @@ export function WhatIsAVector() {
           shapes as meaningfully different for matrix multiplication, so watch for it later.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Theorem: every vector is a unique combination of basis vectors">
+        <p>
+          Define the standard basis vectors <code>e₁ = [1,0,…,0]</code>, <code>e₂ = [0,1,…,0]</code>,
+          …, <code>eₙ = [0,0,…,1]</code> — each a 1 in one position, zeros elsewhere.
+        </p>
+        <p>
+          <strong>Claim:</strong> any vector <code>v = [v₁, v₂, …, vₙ]</code> can be written as{" "}
+          <code>v = v₁e₁ + v₂e₂ + ⋯ + vₙeₙ</code>, and this representation is unique.
+        </p>
+        <p>
+          <strong>Existence:</strong> compute the right-hand side component by component. The i-th
+          component of <code>v₁e₁ + ⋯ + vₙeₙ</code> is <code>vᵢ · 1 = vᵢ</code> (every other term
+          contributes 0 in that position, since eⱼ is zero everywhere except position j). This matches{" "}
+          <code>v</code> exactly in every position, so the sum equals v.
+        </p>
+        <p>
+          <strong>Uniqueness:</strong> suppose also <code>v = c₁e₁ + ⋯ + cₙeₙ</code> for some other
+          coefficients. Looking at component i of both sides gives <code>vᵢ = cᵢ</code> for every i —
+          so the coefficients must be exactly v's own components. No other combination works.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> this is the formal justification for treating "the
+          vector" and "its list of coordinates" as interchangeable — every basis (not just the
+          standard one) gives a similarly unique representation, which is exactly the property section
+          1.13 (Gram-Schmidt) and PCA (section 1.9) both rely on when changing to a more useful basis.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Watch a vector get drawn"
@@ -211,6 +239,28 @@ export function VectorOperations() {
           over the raw dot product for comparing embeddings of very different magnitudes.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: a·b = |a||b|cos(θ)">
+        <p>
+          Start from the <strong>Law of Cosines</strong> applied to the triangle formed by a, b, and
+          the vector a−b, with θ the angle between a and b:
+        </p>
+        <Formula>{"\\|\\vec{a}-\\vec{b}\\|^2 = \\|\\vec{a}\\|^2 + \\|\\vec{b}\\|^2 - 2\\|\\vec{a}\\|\\|\\vec{b}\\|\\cos\\theta"}</Formula>
+        <p>Now expand the same left-hand side purely algebraically, using the dot product's own definition:</p>
+        <Formula>{"\\|\\vec{a}-\\vec{b}\\|^2 = (\\vec{a}-\\vec{b})\\cdot(\\vec{a}-\\vec{b}) = \\|\\vec{a}\\|^2 - 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"}</Formula>
+        <p>Both expressions equal the same quantity, so their right-hand sides are equal:</p>
+        <Formula>{"\\|\\vec{a}\\|^2 + \\|\\vec{b}\\|^2 - 2\\|\\vec{a}\\|\\|\\vec{b}\\|\\cos\\theta = \\|\\vec{a}\\|^2 - 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"}</Formula>
+        <p>
+          The <code>‖a‖²</code> and <code>‖b‖²</code> terms cancel from both sides, leaving{" "}
+          <code>−2‖a‖‖b‖cosθ = −2 a·b</code>, and dividing by −2 gives exactly{" "}
+          <code>a·b = ‖a‖‖b‖cosθ</code>.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> this identity is the entire justification for cosine
+          similarity (used above) and for every "attention score" computation in Transformers (section
+          1.2's expert note) — it's what lets a pure dot product stand in for "how aligned are these
+          two directions" without ever computing an angle directly.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Watch vector addition, tip to tail"
@@ -386,6 +436,31 @@ export function WhatIsAMatrix() {
           (a dataset is rarely square).
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Theorem: matrix-vector multiplication is linear">
+        <p>
+          <strong>Claim:</strong> for any matrix A and vectors x, y and scalar c,{" "}
+          <code>A(x+y) = Ax + Ay</code> and <code>A(cx) = c(Ax)</code> — the two properties that
+          define a <em>linear</em> map, which is exactly why "matrix" and "linear transformation" are
+          treated as the same idea throughout this chapter.
+        </p>
+        <p>
+          <strong>Proof:</strong> row i of <code>A(x+y)</code> is the dot product of A's i-th row with{" "}
+          <code>x+y</code>:
+        </p>
+        <Formula>{"\\sum_j a_{ij}(x_j+y_j) = \\sum_j a_{ij}x_j + \\sum_j a_{ij}y_j"}</Formula>
+        <p>
+          — using ordinary distributivity of multiplication over addition, term by term. The first sum
+          is exactly row i of <code>Ax</code>, and the second is row i of <code>Ay</code>. Since this
+          holds for every row i, <code>A(x+y) = Ax + Ay</code>. The scalar case is even shorter: row i
+          of <code>A(cx)</code> is <code>Σⱼ aᵢⱼ(cxⱼ) = c Σⱼ aᵢⱼxⱼ</code>, which is exactly c times row
+          i of <code>Ax</code>.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> linearity is precisely what makes a neural network layer
+          (section 1.4) predictable and differentiable in closed form — every "linear layer" in every
+          framework is called that specifically because it satisfies this theorem.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="A matrix is rows AND columns at once"
@@ -513,6 +588,22 @@ export function MatrixOperations() {
           this for every combination of row and column and you have the full product.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Theorem: matrix multiplication is associative — (AB)C = A(BC)">
+        <p>
+          Write both sides in index notation and expand using the definition above. Entry (i, l) of{" "}
+          <code>(AB)C</code>:
+        </p>
+        <Formula>{"[(AB)C]_{il} = \\sum_k (AB)_{ik}C_{kl} = \\sum_k \\left(\\sum_j A_{ij}B_{jk}\\right) C_{kl}"}</Formula>
+        <p>Multiply through and swap the (finite) order of summation — always valid for finite sums:</p>
+        <Formula>{"= \\sum_j \\sum_k A_{ij}B_{jk}C_{kl} = \\sum_j A_{ij} \\left(\\sum_k B_{jk}C_{kl}\\right) = \\sum_j A_{ij}(BC)_{jl} = [A(BC)]_{il}"}</Formula>
+        <p>Since this holds for every entry (i, l), the two matrices are identical: (AB)C = A(BC).</p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> associativity is why a deep network's layers can be
+          grouped and composed in any order without changing the result, and why libraries can freely
+          choose the cheapest evaluation order for a long chain of matrix products (exactly the
+          contraction-ordering question raised in section 1.17's expert note).
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked examples" tone="muted">
         <p>Edit the numbers below and watch the result recompute instantly:</p>
       </SectionBlock>
@@ -644,6 +735,30 @@ export function TransposeIdentityInverse() {
           an n×m matrix.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Theorem: (AB)⁻¹ = B⁻¹A⁻¹ (the 'socks and shoes' rule)">
+        <p>
+          <strong>Claim:</strong> if A and B are both invertible, then AB is invertible and its inverse
+          is B⁻¹A⁻¹ — note the order flips, exactly like undoing "put on socks, then shoes" by first
+          removing shoes, then socks.
+        </p>
+        <p>
+          <strong>Proof:</strong> to show B⁻¹A⁻¹ really is the inverse of AB, it's enough to check it
+          satisfies the defining property directly — multiply them together and confirm the result is
+          the identity:
+        </p>
+        <Formula>{"(AB)(B^{-1}A^{-1}) = A(BB^{-1})A^{-1} = A I A^{-1} = AA^{-1} = I"}</Formula>
+        <p>
+          using associativity (proved in section 1.4) to regroup the middle product first. The same
+          check in the other order, <code>(B⁻¹A⁻¹)(AB) = B⁻¹(A⁻¹A)B = B⁻¹IB = B⁻¹B = I</code>, confirms
+          it from both sides, which is exactly what "is the inverse" requires.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> this rule is why, when undoing a sequence of
+          transformations (a rotation followed by a scale, several neural network layers, a chain of
+          coordinate changes), you must invert each step and also reverse their order — never just
+          invert each piece independently and multiply in the original order.
+        </p>
+      </Derivation>
       <DiagramBlock
         id="diagram"
         title="Watch a matrix transpose"
@@ -768,6 +883,35 @@ export function EigenvaluesEigenvectors() {
           equation in λ called the characteristic equation.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: where the characteristic equation comes from">
+        <p>
+          Start directly from the definition and move everything to one side:
+        </p>
+        <Formula>{"A\\vec{v} = \\lambda\\vec{v} \\ \\Longrightarrow\\ A\\vec{v} - \\lambda\\vec{v} = 0 \\ \\Longrightarrow\\ (A-\\lambda I)\\vec{v} = 0"}</Formula>
+        <p>
+          (inserting the identity matrix, section 1.5, so both terms are genuine matrix-vector
+          products that can be factored together). This says v is in the null space of{" "}
+          <code>A − λI</code> — but eigenvectors are required to be <em>nonzero</em> by definition. A
+          matrix has a nonzero vector in its null space exactly when it's singular (section 1.8, 1.11),
+          i.e. exactly when its determinant is zero:
+        </p>
+        <Formula>{"\\det(A - \\lambda I) = 0"}</Formula>
+        <p>
+          For a 2×2 matrix <code>A = [[a,b],[c,d]]</code>, expanding this determinant gives a concrete
+          quadratic in λ:
+        </p>
+        <Formula>{"(a-\\lambda)(d-\\lambda) - bc = \\lambda^2 - (a+d)\\lambda + (ad-bc) = 0"}</Formula>
+        <p>
+          solvable directly by the quadratic formula — for the worked example below (a=2, b=c=0, d=3),
+          this becomes <code>λ² − 5λ + 6 = 0 = (λ−2)(λ−3)</code>, giving exactly λ=2 and λ=3.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> in practice, no library solves this polynomial equation
+          for matrices larger than 2×2 or 3×3 — it's numerically unreliable at scale. Real eigensolvers
+          use the QR algorithm (section 1.13) or power iteration (section 1.23) instead; this
+          derivation is the "why it's true," not the "how it's computed."
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           For <code>A = [[2,0],[0,3]]</code>, try <code>v=[1,0]</code>:
@@ -917,6 +1061,26 @@ export function VectorNorms() {
           — setting p=1 or p=2 recovers the two formulas above.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: the triangle inequality, ‖a+b‖ ≤ ‖a‖+‖b‖">
+        <p>Expand the squared L2 norm of a sum using the dot product directly:</p>
+        <Formula>{"\\|\\vec{a}+\\vec{b}\\|^2 = (\\vec{a}+\\vec{b})\\cdot(\\vec{a}+\\vec{b}) = \\|\\vec{a}\\|^2 + 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"}</Formula>
+        <p>
+          The <strong>Cauchy-Schwarz inequality</strong> states <code>a·b ≤ ‖a‖‖b‖</code> for any two
+          vectors (a direct consequence of section 1.2's identity, since{" "}
+          <code>cos θ ≤ 1</code> always). Substituting this bound in:
+        </p>
+        <Formula>{"\\|\\vec{a}+\\vec{b}\\|^2 \\le \\|\\vec{a}\\|^2 + 2\\|\\vec{a}\\|\\|\\vec{b}\\| + \\|\\vec{b}\\|^2 = (\\|\\vec{a}\\|+\\|\\vec{b}\\|)^2"}</Formula>
+        <p>
+          and since norms are non-negative, taking the square root of both sides preserves the
+          inequality: <code>‖a+b‖ ≤ ‖a‖+‖b‖</code>.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> the triangle inequality is one of the three defining
+          axioms a function must satisfy to legally be called a "norm" or "distance metric" at all —
+          it's what guarantees "going directly somewhere is never longer than a detour," the property
+          every distance-based ML algorithm (k-NN, clustering) silently depends on.
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           For <code>v = [3, -4]</code>:
@@ -1068,6 +1232,32 @@ export function VectorSpacesSpanBasisRank() {
           never have more independent directions than you have rows or columns to define them.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Theorem: the Rank-Nullity theorem">
+        <p>
+          For an m×n matrix A, define the <strong>null space</strong> as every input vector A sends to
+          zero (<code>{"{x : Ax = 0}"}</code>), and the <strong>nullity</strong> as that space's
+          dimension. The theorem states:
+        </p>
+        <Formula>{"\\text{rank}(A) + \\text{nullity}(A) = n"}</Formula>
+        <p>
+          <strong>Why:</strong> pick a basis for the null space (nullity vectors), then extend it to a
+          full basis of the entire n-dimensional input space by adding more vectors (always possible —
+          any independent set can be extended to a basis). Applying A to this extended basis: the
+          null-space vectors all map to 0, contributing nothing new, while the remaining vectors map to
+          a set that turns out to be exactly a basis for A's output (column) space — a short argument
+          shows they must be independent, since any dependency among their images would pull a nonzero
+          combination of them back into the null space, contradicting how they were chosen. So the
+          number of "leftover" basis vectors equals rank(A), and{" "}
+          <code>nullity + rank = n</code> follows immediately by counting.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> this is the precise reason a rank-deficient matrix
+          (section 1.11's determinant-zero case) has a nontrivial null space — it directly explains why{" "}
+          <code>Ax = b</code> has infinitely many solutions (not zero, not exactly one) whenever A is
+          singular: the null space's dimension tells you exactly how many free directions of ambiguity
+          exist.
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           Vectors <code>[1,2]</code> and <code>[2,4]</code> look like two different directions, but{" "}
@@ -1205,6 +1395,35 @@ export function SingularValueDecomposition() {
           matrix to be square or diagonalizable.
         </p>
       </SectionBlock>
+      <Derivation id="derivation" title="Derivation: why SVD always exists">
+        <p>
+          Start from <code>AᵀA</code> — always defined, for any shape of A. It's symmetric (
+          <code>(AᵀA)ᵀ = AᵀA</code>) and positive semi-definite (section 1.14), since for any x,{" "}
+          <code>xᵀ(AᵀA)x = (Ax)ᵀ(Ax) = ‖Ax‖² ≥ 0</code>. By the spectral theorem (section 1.6's expert
+          note), a symmetric matrix always has a full set of orthonormal eigenvectors{" "}
+          <code>v₁,…,vₙ</code> with real, non-negative eigenvalues <code>λ₁,…,λₙ</code>.
+        </p>
+        <p>
+          Define <strong>singular values</strong> <code>σᵢ = √λᵢ</code>, and for each{" "}
+          <code>σᵢ &gt; 0</code>, define <code>uᵢ = Avᵢ/σᵢ</code>. Check these uᵢ are themselves
+          orthonormal:
+        </p>
+        <Formula>{"u_i \\cdot u_j = \\frac{(Av_i)^T(Av_j)}{\\sigma_i\\sigma_j} = \\frac{v_i^T(A^TA)v_j}{\\sigma_i\\sigma_j} = \\frac{\\lambda_j\\,(v_i\\cdot v_j)}{\\sigma_i\\sigma_j}"}</Formula>
+        <p>
+          which is 0 for i≠j (eigenvectors of a symmetric matrix are orthogonal) and exactly 1 when
+          i=j (since <code>λᵢ = σᵢ²</code>). With U's columns as these uᵢ, V's columns as the vᵢ, and Σ
+          holding the σᵢ, the construction directly gives <code>A = UΣVᵀ</code> — and since{" "}
+          <code>AᵀA</code> exists and is always diagonalizable for <em>any</em> matrix A of any shape,
+          this construction never fails.
+        </p>
+        <p className="text-muted-foreground">
+          <strong>Where this is used:</strong> this is exactly the computation running inside{" "}
+          <code>np.linalg.svd</code> conceptually (real implementations use more numerically stable
+          algorithms, but this is the mathematical guarantee behind them) — and it's why SVD, unlike
+          plain eigen-decomposition (section 1.6), never needs to worry about non-square or
+          non-diagonalizable inputs.
+        </p>
+      </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
         <p>
           Keeping only the <em>largest</em> singular value of a matrix (and dropping the rest) gives
