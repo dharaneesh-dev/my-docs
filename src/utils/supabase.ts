@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-// External Supabase project (docs.dharaneesh.in)
+// External Supabase project (notes.dharaneeshboobalan.com)
 // Publishable keys are safe to ship in client code.
 const supabaseUrl = "https://ofluahvlbrfyaiprwoqk.supabase.co";
 const supabaseKey = "sb_publishable_bR2FbHKzR4nFnXmZ-R7chQ_MegvOnLv";

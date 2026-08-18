@@ -37,8 +37,8 @@ export function Determinants() {
         <p>
           <strong>Advanced:</strong> a matrix has an inverse if and only if its determinant is
           non-zero — this is the precise, computable version of the "singular vs. non-singular"
-          language from section 1.5, and it's mathematically identical to saying the matrix has full
-          rank (section 1.8). All three ideas — nonzero determinant, full rank, invertibility — are
+          language from section 1.6, and it's mathematically identical to saying the matrix has full
+          rank (section 1.9). All three ideas — nonzero determinant, full rank, invertibility — are
           exactly the same fact viewed three different ways.
         </p>
       </SectionBlock>
@@ -48,18 +48,18 @@ export function Determinants() {
         <p className="mt-1.5 text-[13.5px] text-muted-foreground">
           For larger matrices the formula generalizes recursively (cofactor expansion), but in
           practice no one computes determinants this way by hand past 3×3 — libraries use LU
-          decomposition (section 1.12) instead, since the determinant of a triangular matrix is just
+          decomposition (section 1.13) instead, since the determinant of a triangular matrix is just
           the product of its diagonal.
         </p>
       </SectionBlock>
       <Derivation id="derivation" title="Derivation: the 2×2 determinant as signed area">
         <p>
           Place two vectors <code>a=(a₁,a₂)</code> and <code>b=(b₁,b₂)</code> as the columns of a
-          matrix — exactly the parallelogram in the diagram below. Decompose the parallelogram's area
-          using the "base times height" formula, resolved into coordinates: the area equals the area
-          of the bounding rectangle <code>(a₁+b₁)(a₂+b₂)</code> minus the four triangles/rectangles
-          around it that aren't part of the parallelogram. Carrying out that bookkeeping (the classic
-          "shoelace formula" derivation) collapses to exactly:
+          matrix — exactly the parallelogram in the diagram below. Decompose the parallelogram's
+          area using the "base times height" formula, resolved into coordinates: the area equals the
+          area of the bounding rectangle <code>(a₁+b₁)(a₂+b₂)</code> minus the four
+          triangles/rectangles around it that aren't part of the parallelogram. Carrying out that
+          bookkeeping (the classic "shoelace formula" derivation) collapses to exactly:
         </p>
         <Formula>{"\\text{Area} = |a_1b_2 - a_2b_1|"}</Formula>
         <p>
@@ -69,10 +69,10 @@ export function Determinants() {
           orientation flip shown in the diagram.
         </p>
         <p className="text-muted-foreground">
-          <strong>Where this is used:</strong> this signed-area interpretation generalizes directly to
-          signed volume in 3D (and hypervolume in higher dimensions), which is exactly what makes the
-          determinant the correct scaling factor in the change-of-variables formula used by
-          normalizing flows (section 1.34).
+          <strong>Where this is used:</strong> this signed-area interpretation generalizes directly
+          to signed volume in 3D (and hypervolume in higher dimensions), which is exactly what makes
+          the determinant the correct scaling factor in the change-of-variables formula used by
+          normalizing flows (section 1.35).
         </p>
       </Derivation>
       <DiagramBlock
@@ -91,7 +91,7 @@ A = np.array([[3, 1], [2, 4]])
 print(np.linalg.det(A))          # 10.0
 
 singular = np.array([[1, 2], [2, 4]])
-print(np.linalg.det(singular))   # 0.0 (rank 1 -> no inverse, section 1.8)
+print(np.linalg.det(singular))   # 0.0 (rank 1 -> no inverse, section 1.9)
 
 # Product rule
 B = np.array([[0, -1], [1, 0]])   # a 90-degree rotation, det = 1
@@ -107,7 +107,7 @@ print(np.linalg.det(A @ B), np.linalg.det(A) * np.linalg.det(B))  # equal`}
           <li>
             <strong>Change of variables</strong> in probability and statistics — transforming a
             probability distribution to a new coordinate system requires dividing by the absolute
-            value of the transformation's Jacobian determinant (section 1.16), to keep total
+            value of the transformation's Jacobian determinant (section 1.17), to keep total
             probability equal to 1.
           </li>
           <li>
@@ -131,14 +131,14 @@ print(np.linalg.det(A @ B), np.linalg.det(A) * np.linalg.det(B))  # equal`}
           <li>
             Trusting <code>det(A) == 0</code> exactly in floating point — real computations produce
             tiny non-zero values like <code>1e-16</code> for genuinely singular matrices. Compare
-            against a small tolerance, or better, check the condition number (section 1.9) instead.
+            against a small tolerance, or better, check the condition number (section 1.10) instead.
           </li>
         </ul>
       </Pitfall>
       <ExpertNote>
         <p>
           The determinant equals the <strong>product of a matrix's eigenvalues</strong> — this is
-          why <code>det(A − λI) = 0</code> (the characteristic equation from section 1.6) works at
+          why <code>det(A − λI) = 0</code> (the characteristic equation from section 1.7) works at
           all: it's asking "for what λ does A − λI become singular (determinant zero)?"
         </p>
         <p>
@@ -164,7 +164,7 @@ export function LuDecomposition() {
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
           <strong>Beginner:</strong> when you need to solve <code>Ax = b</code> for x, computing a
-          full inverse (section 1.5) is overkill — like buying a whole toolbox to turn one screw.{" "}
+          full inverse (section 1.6) is overkill — like buying a whole toolbox to turn one screw.{" "}
           <strong>LU decomposition</strong> splits A into a Lower-triangular matrix L and an
           Upper-triangular matrix U, so that <code>A = LU</code>. Triangular systems are cheap to
           solve directly, without ever forming an inverse.
@@ -195,19 +195,21 @@ export function LuDecomposition() {
         <p>
           "Subtract m times row j from row i" is itself a linear operation on the rows of A — which
           means it can be written as left-multiplying A by an <strong>elementary matrix</strong>{" "}
-          <code>E</code>: the identity matrix (section 1.5) with a single extra <code>−m</code> placed
-          in position (i, j). One elimination step is <code>A → EA</code>.
+          <code>E</code>: the identity matrix (section 1.6) with a single extra <code>−m</code>{" "}
+          placed in position (i, j). One elimination step is <code>A → EA</code>.
         </p>
         <p>
-          Elementary matrices are trivially invertible — undoing "subtract m times row j from row i" is
-          just "add m times row j back to row i," so <code>E⁻¹</code> is E with that one entry negated
-          back to <code>+m</code>.
+          Elementary matrices are trivially invertible — undoing "subtract m times row j from row i"
+          is just "add m times row j back to row i," so <code>E⁻¹</code> is E with that one entry
+          negated back to <code>+m</code>.
         </p>
         <p>
           Eliminate every entry below the diagonal with a sequence <code>E_k⋯E_1</code>, arriving at
           the upper-triangular result: <code>E_k⋯E_1 A = U</code>. Solving for A:
         </p>
-        <Formula>{"A = E_1^{-1}\\cdots E_k^{-1} U = LU, \\quad L := E_1^{-1}\\cdots E_k^{-1}"}</Formula>
+        <Formula>
+          {"A = E_1^{-1}\\cdots E_k^{-1} U = LU, \\quad L := E_1^{-1}\\cdots E_k^{-1}"}
+        </Formula>
         <p>
           L is a product of lower-triangular matrices (each E⁻¹ is lower-triangular with 1s on the
           diagonal), and the product of lower-triangular matrices is always lower-triangular — which
@@ -215,8 +217,8 @@ export function LuDecomposition() {
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this is precisely what a numerical library does
-          internally when you call a solver — Gaussian elimination isn't a separate algorithm from LU
-          decomposition, it <em>is</em> LU decomposition, just narrated step by step instead of
+          internally when you call a solver — Gaussian elimination isn't a separate algorithm from
+          LU decomposition, it <em>is</em> LU decomposition, just narrated step by step instead of
           packaged into L and U at the end.
         </p>
       </Derivation>
@@ -273,7 +275,7 @@ print(x_slow, x_fast, x_reused)   # all equal: [1. 3.]`}
           <li>
             Computing <code>np.linalg.inv(A) @ b</code> instead of{" "}
             <code>np.linalg.solve(A, b)</code> — it's slower, less accurate, and considered bad
-            practice in every numerical computing community for exactly the same reason section 1.5
+            practice in every numerical computing community for exactly the same reason section 1.6
             flagged it.
           </li>
           <li>
@@ -290,7 +292,7 @@ print(x_slow, x_fast, x_reused)   # all equal: [1. 3.]`}
         </p>
         <p>
           At the master level: for the special case of a symmetric positive-definite matrix (section
-          1.14), <strong>Cholesky decomposition</strong> is an even cheaper, more stable variant of
+          1.15), <strong>Cholesky decomposition</strong> is an even cheaper, more stable variant of
           LU that exploits the symmetry to do roughly half the work again — this is why
           covariance-matrix heavy code (Gaussian processes, Kalman filters, Bayesian inference)
           almost always reaches for Cholesky specifically rather than generic LU.
@@ -307,7 +309,7 @@ export function QrGramSchmidt() {
         <p>
           <strong>Beginner:</strong> <strong>orthogonalization</strong> means turning a set of
           vectors into a set that all point perpendicular to each other, without changing what they
-          span (section 1.8). The classic recipe for doing this is the{" "}
+          span (section 1.9). The classic recipe for doing this is the{" "}
           <strong>Gram-Schmidt process</strong>: take each new vector, subtract off whatever part of
           it points along the directions you already have, and keep only what's left over — which is
           automatically perpendicular to everything before it.
@@ -321,7 +323,7 @@ export function QrGramSchmidt() {
         </p>
         <p>
           <strong>Advanced:</strong> QR gives a numerically superior way to solve least-squares
-          regression compared to the normal equation from section 1.5 (<code>w = (XᵀX)⁻¹Xᵀy</code>).
+          regression compared to the normal equation from section 1.6 (<code>w = (XᵀX)⁻¹Xᵀy</code>).
           Forming <code>XᵀX</code> squares the condition number of X, amplifying numerical error;
           solving via QR avoids that squaring entirely, which is why serious statistical software
           defaults to a QR-based solver rather than the textbook formula.
@@ -335,17 +337,26 @@ export function QrGramSchmidt() {
           directions subtracted out.
         </p>
       </SectionBlock>
-      <Derivation id="derivation" title="Derivation: why the leftover piece is always perpendicular">
+      <Derivation
+        id="derivation"
+        title="Derivation: why the leftover piece is always perpendicular"
+      >
         <p>
           Given a fixed direction <code>e₁</code> (unit length) and a new vector <code>a₂</code>,
           define the projection coefficient <code>c = a₂·e₁</code> and subtract it off:
         </p>
-        <Formula>{"\\vec{u} = \\vec{a}_2 - c\\,\\vec{e}_1, \\qquad c = \\vec{a}_2\\cdot\\vec{e}_1"}</Formula>
+        <Formula>
+          {"\\vec{u} = \\vec{a}_2 - c\\,\\vec{e}_1, \\qquad c = \\vec{a}_2\\cdot\\vec{e}_1"}
+        </Formula>
         <p>
-          <strong>Claim:</strong> u is exactly perpendicular to e₁. <strong>Proof:</strong> compute the
-          dot product directly:
+          <strong>Claim:</strong> u is exactly perpendicular to e₁. <strong>Proof:</strong> compute
+          the dot product directly:
         </p>
-        <Formula>{"\\vec{u}\\cdot\\vec{e}_1 = \\vec{a}_2\\cdot\\vec{e}_1 - c(\\vec{e}_1\\cdot\\vec{e}_1) = c - c\\cdot 1 = 0"}</Formula>
+        <Formula>
+          {
+            "\\vec{u}\\cdot\\vec{e}_1 = \\vec{a}_2\\cdot\\vec{e}_1 - c(\\vec{e}_1\\cdot\\vec{e}_1) = c - c\\cdot 1 = 0"
+          }
+        </Formula>
         <p>
           (using <code>e₁·e₁ = ‖e₁‖² = 1</code>, since e₁ is a unit vector). This holds for{" "}
           <em>any</em> choice of a₂ — c is defined precisely so this cancellation always happens,
@@ -354,8 +365,8 @@ export function QrGramSchmidt() {
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> repeating this subtraction against every previously
           built direction, one at a time, is the entire Gram-Schmidt algorithm — each new vector is
-          only ever guaranteed perpendicular to what came immediately before it, which is exactly why
-          the process must go through the vectors in order.
+          only ever guaranteed perpendicular to what came immediately before it, which is exactly
+          why the process must go through the vectors in order.
         </p>
       </Derivation>
       <DiagramBlock
@@ -424,7 +435,7 @@ print(np.allclose(w, w2))   # True`}
           QR decomposition isn't just for least squares — the <strong>QR algorithm</strong>{" "}
           (repeatedly factoring a matrix as QR, then multiplying the factors back together in
           reverse order, and iterating) is the actual method general-purpose numerical libraries use
-          to compute eigenvalues (section 1.6) for matrices larger than 2×2 or 3×3. The "solve the
+          to compute eigenvalues (section 1.7) for matrices larger than 2×2 or 3×3. The "solve the
           characteristic polynomial" method taught in school is essentially never used in real
           software — it's numerically unreliable for anything but the smallest matrices.
         </p>
@@ -447,7 +458,7 @@ export function PositiveDefiniteCholesky() {
           <strong>Beginner:</strong> a square symmetric matrix A is{" "}
           <strong>positive definite</strong> if, for every nonzero vector x, the number{" "}
           <code>xᵀAx</code> comes out positive. Think of it as a generalization of "this number is
-          positive" to matrices — it's the condition that makes the quadratic bowl from section 1.15
+          positive" to matrices — it's the condition that makes the quadratic bowl from section 1.16
           always curve <em>upward</em>, everywhere, with a single clear minimum.
         </p>
         <p>
@@ -476,27 +487,29 @@ export function PositiveDefiniteCholesky() {
       <Derivation id="derivation" title="Derivation: solving for L, entry by entry">
         <p>
           Write out <code>A = LLᵀ</code> entry by entry and solve column by column. For the diagonal
-          entry <code>Ajj</code>, matching it against the corresponding entry of <code>LLᵀ</code> gives{" "}
-          <code>Ajj = Σₖ₌₁ʲ Ljk²</code> (only terms up to k=j survive, since L is lower-triangular).
-          Solving for the one new unknown, <code>Ljj</code>:
+          entry <code>Ajj</code>, matching it against the corresponding entry of <code>LLᵀ</code>{" "}
+          gives <code>Ajj = Σₖ₌₁ʲ Ljk²</code> (only terms up to k=j survive, since L is
+          lower-triangular). Solving for the one new unknown, <code>Ljj</code>:
         </p>
         <Formula>{"L_{jj} = \\sqrt{A_{jj} - \\sum_{k=1}^{j-1} L_{jk}^2}"}</Formula>
         <p>
           Every off-diagonal entry below it, <code>Aij</code> for i&gt;j, similarly matches{" "}
           <code>Aij = Σₖ Lik Ljk</code>, giving:
         </p>
-        <Formula>{"L_{ij} = \\frac{1}{L_{jj}}\\left(A_{ij} - \\sum_{k=1}^{j-1} L_{ik}L_{jk}\\right)"}</Formula>
+        <Formula>
+          {"L_{ij} = \\frac{1}{L_{jj}}\\left(A_{ij} - \\sum_{k=1}^{j-1} L_{ik}L_{jk}\\right)"}
+        </Formula>
         <p>
-          Working column by column, left to right, every L entry only ever depends on entries computed
-          earlier — so the whole matrix can be filled in with no guessing, no iteration, and no need to
-          solve a system. This only works because the square root above never hits a negative number —
-          which is precisely what positive-definiteness guarantees.
+          Working column by column, left to right, every L entry only ever depends on entries
+          computed earlier — so the whole matrix can be filled in with no guessing, no iteration,
+          and no need to solve a system. This only works because the square root above never hits a
+          negative number — which is precisely what positive-definiteness guarantees.
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this is literally the algorithm{" "}
           <code>np.linalg.cholesky</code> runs — a direct, non-iterative, column-by-column
-          computation, which is exactly why Cholesky is faster than generic eigen-decomposition or LU
-          (section 1.12) for this specific, common case.
+          computation, which is exactly why Cholesky is faster than generic eigen-decomposition or
+          LU (section 1.13) for this specific, common case.
         </p>
       </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
@@ -583,7 +596,7 @@ def is_pd(A):
           compute the log-determinant needed for a multivariate Gaussian log-likelihood:{" "}
           <code>log|Σ| = 2·Σᵢ log(Lᵢᵢ)</code> — summing the log of L's diagonal — which is both
           faster and dramatically more numerically stable than computing the determinant directly
-          (section 1.11), and is exactly what every serious probabilistic modeling library does.
+          (section 1.12), and is exactly what every serious probabilistic modeling library does.
         </p>
       </ExpertNote>
     </>
@@ -604,7 +617,7 @@ export function QuadraticFormsConvexity() {
           <strong>Intermediate:</strong> whether that surface is a bowl (has one clear minimum), a
           dome (one clear maximum), or a saddle (curves up in one direction and down in another,
           with no true min or max) is determined entirely by the sign pattern of A's eigenvalues
-          (section 1.6): all positive → bowl (A is positive definite, section 1.14); all negative →
+          (section 1.7): all positive → bowl (A is positive definite, section 1.15); all negative →
           dome; mixed signs → saddle.
         </p>
         <p>
@@ -634,24 +647,30 @@ export function QuadraticFormsConvexity() {
           The second-order Taylor expansion of any smooth function f around a point x, for a small
           step h, is:
         </p>
-        <Formula>{"f(\\vec{x}+\\vec{h}) \\approx f(\\vec{x}) + \\nabla f(\\vec{x})^T\\vec{h} + \\tfrac{1}{2}\\vec{h}^T H \\vec{h}"}</Formula>
+        <Formula>
+          {
+            "f(\\vec{x}+\\vec{h}) \\approx f(\\vec{x}) + \\nabla f(\\vec{x})^T\\vec{h} + \\tfrac{1}{2}\\vec{h}^T H \\vec{h}"
+          }
+        </Formula>
         <p>
-          At a <strong>critical point</strong>, <code>∇f(x) = 0</code> by definition — the linear term
-          vanishes entirely, leaving:
+          At a <strong>critical point</strong>, <code>∇f(x) = 0</code> by definition — the linear
+          term vanishes entirely, leaving:
         </p>
-        <Formula>{"f(\\vec{x}+\\vec{h}) - f(\\vec{x}) \\approx \\tfrac{1}{2}\\vec{h}^T H \\vec{h}"}</Formula>
+        <Formula>
+          {"f(\\vec{x}+\\vec{h}) - f(\\vec{x}) \\approx \\tfrac{1}{2}\\vec{h}^T H \\vec{h}"}
+        </Formula>
         <p>
-          — exactly the quadratic form this lesson studies, now with A replaced by the Hessian H. If H
-          is positive definite, this is positive for every nonzero step h, meaning{" "}
-          <code>f(x+h) &gt; f(x)</code> in every direction — a genuine local minimum. If H is negative
-          definite, every step decreases f — a local maximum. If H is indefinite, some directions
-          increase f and others decrease it from the very same point — a saddle.
+          — exactly the quadratic form this lesson studies, now with A replaced by the Hessian H. If
+          H is positive definite, this is positive for every nonzero step h, meaning{" "}
+          <code>f(x+h) &gt; f(x)</code> in every direction — a genuine local minimum. If H is
+          negative definite, every step decreases f — a local maximum. If H is indefinite, some
+          directions increase f and others decrease it from the very same point — a saddle.
         </p>
         <p className="text-muted-foreground">
-          <strong>Where this is used:</strong> this is the rigorous version of the "second derivative
-          test" from single-variable calculus, generalized to as many dimensions as a neural network
-          has parameters — and it's exactly what Newton's method and K-FAC-style optimizers use the
-          Hessian for.
+          <strong>Where this is used:</strong> this is the rigorous version of the "second
+          derivative test" from single-variable calculus, generalized to as many dimensions as a
+          neural network has parameters — and it's exactly what Newton's method and K-FAC-style
+          optimizers use the Hessian for.
         </p>
       </Derivation>
       <DiagramBlock
@@ -700,7 +719,7 @@ print(classify(np.array([[-2, 0], [0, -3]])))  # local maximum`}
             <code>x ← x − H⁻¹∇f</code>) to take smarter steps than plain gradient descent,
             converging much faster near a minimum — at the cost of needing to compute and invert the
             Hessian. In practice, that inversion is done approximately via conjugate gradient
-            (section 1.33), using Hessian-vector products (section 1.31) so the full Hessian is
+            (section 1.34), using Hessian-vector products (section 1.32) so the full Hessian is
             never actually formed.
           </li>
         </ul>
@@ -727,7 +746,7 @@ print(classify(np.array([[-2, 0], [0, -3]])))  # local maximum`}
         </p>
         <p>
           At the master level: a striking, counter-intuitive result from high-dimensional random
-          matrix theory (section 1.18) is that in very high-dimensional non-convex landscapes,
+          matrix theory (section 1.19) is that in very high-dimensional non-convex landscapes,
           critical points with a mix of positive and negative Hessian eigenvalues (saddle points)
           vastly outnumber true local minima — and most of the "getting stuck" behavior once blamed
           on bad local minima in deep learning is now understood to be about escaping saddle points
@@ -760,7 +779,7 @@ export function MatrixCalculus() {
           <strong>Intermediate:</strong> the <strong>Jacobian</strong> generalizes this to functions
           that output a whole vector, not just a single number: it's a matrix where row i is the
           gradient of output i with respect to every input. The <strong>Hessian</strong> (section
-          1.15) is the Jacobian of the gradient itself — the matrix of all second derivatives.
+          1.16) is the Jacobian of the gradient itself — the matrix of all second derivatives.
         </p>
         <p>
           <strong>Advanced:</strong> the chain rule, written in matrix form, says the Jacobian of a
@@ -787,21 +806,25 @@ export function MatrixCalculus() {
         <Formula>{"f(\\vec{x}) = \\vec{x}^TA\\vec{x} = \\sum_i \\sum_j A_{ij}x_ix_j"}</Formula>
         <p>
           Differentiate with respect to one single coordinate <code>xₖ</code>, using the ordinary
-          product rule on every term that contains xₖ. A term <code>Aᵢⱼxᵢxⱼ</code> contains xₖ either
-          when i=k (contributing <code>Akjxj</code>) or when j=k (contributing <code>Aikxi</code>) —
-          both cases can happen at once only when i=j=k, but the sum below already handles that
-          correctly:
+          product rule on every term that contains xₖ. A term <code>Aᵢⱼxᵢxⱼ</code> contains xₖ
+          either when i=k (contributing <code>Akjxj</code>) or when j=k (contributing{" "}
+          <code>Aikxi</code>) — both cases can happen at once only when i=j=k, but the sum below
+          already handles that correctly:
         </p>
-        <Formula>{"\\frac{\\partial f}{\\partial x_k} = \\sum_j A_{kj}x_j + \\sum_i A_{ik}x_i = (A\\vec{x})_k + (A^T\\vec{x})_k"}</Formula>
+        <Formula>
+          {
+            "\\frac{\\partial f}{\\partial x_k} = \\sum_j A_{kj}x_j + \\sum_i A_{ik}x_i = (A\\vec{x})_k + (A^T\\vec{x})_k"
+          }
+        </Formula>
         <p>
           Collecting this across every k gives the full gradient vector,{" "}
-          <code>∇f = Ax + Aᵀx = (A+Aᵀ)x</code>. When A is symmetric (<code>A = Aᵀ</code>, section 1.6's
-          expert note), this simplifies immediately to <code>2Ax</code>.
+          <code>∇f = Ax + Aᵀx = (A+Aᵀ)x</code>. When A is symmetric (<code>A = Aᵀ</code>, section
+          1.7's expert note), this simplifies immediately to <code>2Ax</code>.
         </p>
         <p className="text-muted-foreground">
-          <strong>Where this is used:</strong> setting this gradient to zero and solving is exactly how
-          the closed-form solution to linear and ridge regression (sections 1.5, 1.8) is derived — the
-          "normal equation" is nothing more than this identity, solved for x.
+          <strong>Where this is used:</strong> setting this gradient to zero and solving is exactly
+          how the closed-form solution to linear and ridge regression (sections 1.6, 1.9) is derived
+          — the "normal equation" is nothing more than this identity, solved for x.
         </p>
       </Derivation>
       <DiagramBlock
@@ -851,14 +874,14 @@ print(numeric_grad(x))   # should match closely -> "gradient checking"`}
           </li>
           <li>
             <strong>Normalizing flows</strong> in generative modeling need the Jacobian determinant
-            (section 1.11) of each transformation to correctly track how probability density changes
+            (section 1.12) of each transformation to correctly track how probability density changes
             — they're specifically engineered so that Jacobian is triangular and cheap to compute
-            (section 1.34).
+            (section 1.35).
           </li>
           <li>
             <strong>Second-order optimizers</strong> (Newton's method, L-BFGS) use the Hessian or an
             approximation of it to converge faster than plain gradient descent near a solution — in
-            practice via Hessian-vector products (section 1.31) rather than the full matrix.
+            practice via Hessian-vector products (section 1.32) rather than the full matrix.
           </li>
         </ul>
       </SectionBlock>
@@ -932,9 +955,9 @@ export function EinsumTensorContractions() {
       </SectionBlock>
       <Derivation id="derivation" title="Derivation: why contraction order changes the cost">
         <p>
-          Chaining three matrices, <code>ABC</code>, is associative (section 1.4) — the{" "}
-          <em>result</em> is identical regardless of grouping — but the amount of <em>work</em> is not.
-          Suppose A is (100×5), B is (5×100), and C is (100×5).
+          Chaining three matrices, <code>ABC</code>, is associative (section 1.5) — the{" "}
+          <em>result</em> is identical regardless of grouping — but the amount of <em>work</em> is
+          not. Suppose A is (100×5), B is (5×100), and C is (100×5).
         </p>
         <p>
           Computing <code>(AB)C</code>: first <code>AB</code> costs about{" "}
@@ -942,15 +965,16 @@ export function EinsumTensorContractions() {
           <code>(AB)C</code> costs <code>100×100×5 = 50,000</code> more — about 100,000 total.
         </p>
         <p>
-          Computing <code>A(BC)</code> instead: <code>BC</code> costs{" "}
-          <code>5×100×5 = 2,500</code> and produces a tiny (5×5) matrix; then{" "}
-          <code>A(BC)</code> costs <code>100×5×5 = 2,500</code> more — only 5,000 total, a 20× saving,
-          purely from choosing a smarter grouping of the exact same product.
+          Computing <code>A(BC)</code> instead: <code>BC</code> costs <code>5×100×5 = 2,500</code>{" "}
+          and produces a tiny (5×5) matrix; then <code>A(BC)</code> costs{" "}
+          <code>100×5×5 = 2,500</code> more — only 5,000 total, a 20× saving, purely from choosing a
+          smarter grouping of the exact same product.
         </p>
         <p className="text-muted-foreground">
-          <strong>Where this is used:</strong> this is exactly the optimization <code>opt_einsum</code>{" "}
-          (section 1.17's expert note) performs automatically for any chain of three or more tensors —
-          searching for the contraction order with the lowest total cost before executing anything.
+          <strong>Where this is used:</strong> this is exactly the optimization{" "}
+          <code>opt_einsum</code> (section 1.18's expert note) performs automatically for any chain
+          of three or more tensors — searching for the contraction order with the lowest total cost
+          before executing anything.
         </p>
       </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
@@ -998,7 +1022,7 @@ print(scores.shape)   # (2, 6, 6) -> one score per query/key pair, per batch ite
             <strong>Convolutional layers</strong> can be implemented as a structured matrix
             multiplication using the "im2col" technique — unfolding overlapping image patches into
             rows of a matrix, then computing the whole convolution as a single matmul. This is
-            exactly why hardware optimized for matmul (Tensor Cores, section 1.4) is also fast at
+            exactly why hardware optimized for matmul (Tensor Cores, section 1.5) is also fast at
             convolution.
           </li>
           <li>
@@ -1090,23 +1114,23 @@ export function RandomMatrixTheory() {
       <Derivation id="derivation" title="Proof sketch: the moment method">
         <p>
           A full rigorous proof of Wigner's theorem is genuinely graduate-level, but the core idea —
-          the <strong>moment method</strong> — is short enough to sketch honestly. The k-th moment of
-          the eigenvalue distribution equals <code>(1/n)·E[trace(Aᵏ)]</code> (trace = sum of
-          eigenvalues, section 1.22, applied to <code>Aᵏ</code>).
+          the <strong>moment method</strong> — is short enough to sketch honestly. The k-th moment
+          of the eigenvalue distribution equals <code>(1/n)·E[trace(Aᵏ)]</code> (trace = sum of
+          eigenvalues, section 1.23, applied to <code>Aᵏ</code>).
         </p>
         <p>
           Expanding <code>{"trace(Aᵏ) = Σ A(i₁,i₂)A(i₂,i₃)⋯A(i_k,i₁)"}</code> turns this into a sum
-          over every closed "walk" of length k through the matrix's indices. Since entries are independent
-          random values with mean 0, any walk that uses some edge only once contributes an average of
-          exactly zero (that lone random factor averages away). Only walks where every edge is
-          traversed an even number of times survive.
+          over every closed "walk" of length k through the matrix's indices. Since entries are
+          independent random values with mean 0, any walk that uses some edge only once contributes
+          an average of exactly zero (that lone random factor averages away). Only walks where every
+          edge is traversed an even number of times survive.
         </p>
         <p>
           Counting surviving walks and normalizing by the <code>1/√n</code> scaling shows the odd
           moments vanish entirely and the even moments converge exactly to the{" "}
-          <strong>Catalan numbers</strong> — which are, by a classical identity, precisely the moments
-          of the semicircle distribution. Matching all moments (informally) pins down the limiting
-          distribution as the semicircle.
+          <strong>Catalan numbers</strong> — which are, by a classical identity, precisely the
+          moments of the semicircle distribution. Matching all moments (informally) pins down the
+          limiting distribution as the semicircle.
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this exact combinatorial technique (counting
@@ -1190,12 +1214,12 @@ print("1/sqrt(n) scaling:", np.linalg.norm(out_good))`}
           random matrices, the eigenvalues instead fill a disk in the complex plane (the "circular
           law"); for the singular values of random rectangular matrices, the analogous result is the{" "}
           <strong>Marchenko-Pastur distribution</strong> — directly relevant to understanding the
-          behavior of SVD (section 1.9) on high-dimensional, mostly-noise data matrices.
+          behavior of SVD (section 1.10) on high-dimensional, mostly-noise data matrices.
         </p>
         <p>
           At the master level: recent theoretical work on deep learning loss landscapes leans
           directly on random matrix theory to argue that in very high-dimensional non-convex
-          problems, saddle points (section 1.15) vastly outnumber genuine local minima among a
+          problems, saddle points (section 1.16) vastly outnumber genuine local minima among a
           network's critical points — this random-matrix argument is a major reason the field's
           understanding shifted away from "fear of bad local minima" toward "escaping saddle points"
           as the primary obstacle in deep learning optimization.

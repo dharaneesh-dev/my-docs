@@ -1,8 +1,9 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "Knowledge Base | By Dharaneesh Boobalan",
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "author": "Dharaneesh Boobalan",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",

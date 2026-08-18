@@ -24,7 +24,7 @@ export function MatrixNorms() {
     <>
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
-          <strong>Beginner:</strong> section 1.7 measured the "size" of a <em>vector</em>. Matrices
+          <strong>Beginner:</strong> section 1.8 measured the "size" of a <em>vector</em>. Matrices
           need their own notion of size too — for example, "how big is the error between this matrix
           and its low-rank approximation?" A <strong>matrix norm</strong> answers exactly that.
         </p>
@@ -32,12 +32,12 @@ export function MatrixNorms() {
           <strong>Intermediate:</strong> the simplest one, the <strong>Frobenius norm</strong>, just
           treats the matrix as one long vector of all its entries and takes the ordinary L2 length
           of that — squares every entry, sums, square-roots. The <strong>spectral norm</strong> is
-          different in kind: it's the matrix's largest singular value (section 1.9) — the single
+          different in kind: it's the matrix's largest singular value (section 1.10) — the single
           biggest amount it can stretch <em>any</em> input vector by.
         </p>
         <p>
           <strong>Advanced:</strong> the <strong>nuclear norm</strong> (sum of all singular values)
-          is the matrix analogue of the L1 norm from section 1.7 — and just as L1 regularization on
+          is the matrix analogue of the L1 norm from section 1.8 — and just as L1 regularization on
           a vector pushes individual entries to exactly zero (automatic feature selection),
           nuclear-norm regularization on a matrix pushes singular values to exactly zero, which
           means it pushes the <em>rank</em> down. This is the mathematical basis of low-rank matrix
@@ -90,7 +90,7 @@ export function MatrixNorms() {
         <p>
           For <code>A = [[3, 0], [4, 5]]</code>, the Frobenius norm is the easiest to check by hand:{" "}
           <code>√(3² + 0² + 4² + 5²) = √50 ≈ 7.07</code> — just treat every entry as one long
-          vector. The spectral and nuclear norms both require the singular values (section 1.9)
+          vector. The spectral and nuclear norms both require the singular values (section 1.10)
           first. Since <code>AᵀA = [[25, 20], [20, 25]]</code> has eigenvalues 45 and 5, A's
           singular values are <code>√45 ≈ 6.71</code> and <code>√5 ≈ 2.24</code> — so the spectral
           norm is <code>‖A‖₂ ≈ 6.71</code> (the larger one) and the nuclear norm is{" "}
@@ -111,7 +111,7 @@ nuclear = np.linalg.norm(A, 'nuc')        # sum of all singular values
 
 print(frob, spectral, nuclear)
 
-# Spectral norm connects directly to the SVD from section 1.9:
+# Spectral norm connects directly to the SVD from section 1.10:
 _, S, _ = np.linalg.svd(A)
 print(np.isclose(spectral, S.max()))   # True`}
       >
@@ -137,7 +137,7 @@ print(np.isclose(spectral, S.max()))   # True`}
           <li>
             <strong>Weight decay</strong> is, technically, Frobenius-norm regularization of a weight
             matrix — the direct matrix generalization of the L2 vector regularization from section
-            1.7.
+            1.8.
           </li>
         </ul>
       </SectionBlock>
@@ -162,7 +162,7 @@ print(np.isclose(spectral, S.max()))   # True`}
           any matrix.
         </p>
         <p>
-          At the master level: the Frobenius norm equals <code>√trace(AᵀA)</code> (section 1.22) —
+          At the master level: the Frobenius norm equals <code>√trace(AᵀA)</code> (section 1.23) —
           connecting matrix norms, the trace, and the SVD into one identity, and explaining why
           "Frobenius norm of the reconstruction error" and "sum of squared residuals" are the exact
           same quantity used throughout PCA and matrix factorization literature.
@@ -278,7 +278,7 @@ print(logsumexp(x))   # a normal, finite number`}
             losses on certain inputs.
           </li>
           <li>
-            <strong>Log-determinants</strong> (section 1.11) and Gaussian log-likelihoods use the
+            <strong>Log-determinants</strong> (section 1.12) and Gaussian log-likelihoods use the
             same underlying principle: work in log-space as long as possible, only exponentiate at
             the very end, if at all.
           </li>
@@ -305,7 +305,7 @@ print(logsumexp(x))   # a normal, finite number`}
           <strong>log-sum-exp trick</strong> for exactly this reason.
         </p>
         <p>
-          At the master level: float16/bfloat16 mixed-precision training (section 1.4's Tensor
+          At the master level: float16/bfloat16 mixed-precision training (section 1.5's Tensor
           Cores) makes numerical stability substantially more fragile than float32 — this is
           precisely why modern training frameworks use <strong>loss scaling</strong> (multiplying
           the loss by a large constant before the backward pass, then dividing gradients by the same
@@ -347,7 +347,7 @@ export function SparseMatrices() {
       </SectionBlock>
       <SectionBlock id="formula" label="Formula" tone="formula">
         <div className="mb-1.5 font-medium text-foreground">
-          Dense vs. COO sparse storage, n non-zero entries out of m×n total:
+          Dense vs. COO sparse storage, k non-zero entries out of m×n total:
         </div>
         <Formula>
           {
@@ -428,7 +428,7 @@ result = sparse_csr @ v`}
             exactly why graph neural network libraries are built around sparse matrix operations.
           </li>
           <li>
-            <strong>Recommender system</strong> user-item matrices (section 1.9) are sparse by
+            <strong>Recommender system</strong> user-item matrices (section 1.10) are sparse by
             construction — most users haven't rated most items.
           </li>
         </ul>
@@ -449,7 +449,7 @@ result = sparse_csr @ v`}
       <ExpertNote>
         <p>
           Sparse matrix multiplication (SpMM) and sparse matrix-vector multiplication (SpMV) are
-          fundamentally harder to parallelize efficiently on GPUs than dense GEMM (section 1.4) —
+          fundamentally harder to parallelize efficiently on GPUs than dense GEMM (section 1.5) —
           the irregular memory access pattern of "only touch the non-zeros" doesn't map cleanly onto
           Tensor Cores, which is an active area of systems research (block-sparse formats,
           structured sparsity) specifically aimed at closing this gap.
@@ -479,13 +479,13 @@ export function TraceOfAMatrix() {
         <p>
           <strong>Intermediate:</strong> despite being so simple to compute, the trace has a
           surprisingly useful property: <code>trace(AB) = trace(BA)</code>, even though{" "}
-          <code>AB ≠ BA</code> in general (section 1.4). This "cyclic property" extends to any
+          <code>AB ≠ BA</code> in general (section 1.5). This "cyclic property" extends to any
           number of matrices multiplied in a chain, as long as you only rotate the order rather than
           reversing it — and it's what makes the trace so convenient inside derivations.
         </p>
         <p>
           <strong>Advanced:</strong> the trace also equals the{" "}
-          <strong>sum of a matrix's eigenvalues</strong> (just as the determinant, section 1.11,
+          <strong>sum of a matrix's eigenvalues</strong> (just as the determinant, section 1.12,
           equals their <em>product</em>) — a fact that holds regardless of whether the matrix is
           diagonalizable, and connects this simple sum directly back to the deep structure of the
           matrix.
@@ -526,7 +526,7 @@ export function TraceOfAMatrix() {
         </p>
         <p className="mt-2 text-[13px] text-muted-foreground">
           Where this is used: this exact swap-the-sum trick is the standard way to derive gradients
-          of scalar loss functions with respect to matrices (section 1.16) — rewriting{" "}
+          of scalar loss functions with respect to matrices (section 1.17) — rewriting{" "}
           <code>xᵀAx</code> as <code>trace(Axxᵀ)</code> converts an expression that's awkward to
           differentiate directly into one with a known matrix-derivative identity.
         </p>
@@ -551,7 +551,7 @@ print(np.trace(A @ B), np.trace(B @ A))   # equal, even though A@B != B@A
 eigvals = np.linalg.eigvals(A)
 print(np.isclose(np.trace(A), eigvals.sum().real))   # True
 
-# Frobenius norm (section 1.19) via trace:
+# Frobenius norm (section 1.20) via trace:
 frob_via_trace = np.sqrt(np.trace(A.T @ A))
 print(np.isclose(frob_via_trace, np.linalg.norm(A, 'fro')))   # True`}
       >
@@ -569,11 +569,11 @@ print(np.isclose(frob_via_trace, np.linalg.norm(A, 'fro')))   # True`}
           </li>
           <li>
             <strong>Weight decay / L2 regularization</strong> of a weight matrix is literally{" "}
-            <code>trace(WᵀW)</code>, connecting straight back to the Frobenius norm of section 1.19.
+            <code>trace(WᵀW)</code>, connecting straight back to the Frobenius norm of section 1.20.
           </li>
           <li>
             The cyclic property is the standard trick used to simplify matrix-calculus derivations
-            (section 1.16) that would otherwise involve unwieldy chains of matrix products.
+            (section 1.17) that would otherwise involve unwieldy chains of matrix products.
           </li>
         </ul>
       </SectionBlock>
@@ -595,7 +595,7 @@ print(np.isclose(frob_via_trace, np.linalg.norm(A, 'fro')))   # True`}
         </p>
         <p>
           At the master level: the trace of a matrix is invariant under a change of basis (section
-          1.1's expert note) — <code>trace(P⁻¹AP) = trace(A)</code> for any invertible P — exactly
+          1.2's expert note) — <code>trace(P⁻¹AP) = trace(A)</code> for any invertible P — exactly
           like the determinant, and for the same underlying reason: both are functions purely of the
           eigenvalues, which don't depend on which coordinate system you chose to describe the
           matrix in.
@@ -610,7 +610,7 @@ export function PowerIteration() {
     <>
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
-          <strong>Beginner:</strong> section 1.6 introduced eigenvalues and eigenvectors, but never
+          <strong>Beginner:</strong> section 1.7 introduced eigenvalues and eigenvectors, but never
           said how to actually <em>find</em> them by computer for a matrix too large to solve by
           hand. <strong>Power iteration</strong> is the simplest possible algorithm: start with any
           vector, repeatedly multiply it by the matrix, and normalize after each step. That's the
@@ -626,7 +626,7 @@ export function PowerIteration() {
         <p>
           <strong>Advanced:</strong> the running estimate of the eigenvalue itself, at any step, is
           given by the <strong>Rayleigh quotient</strong>, <code>vᵀAv / vᵀv</code> — and this is
-          precisely what the real QR algorithm (section 1.13's expert note) generalizes into a full,
+          precisely what the real QR algorithm (section 1.14's expert note) generalizes into a full,
           robust method for finding <em>every</em> eigenvalue of a matrix, not just the dominant
           one.
         </p>
@@ -667,7 +667,7 @@ export function PowerIteration() {
           iteration locks on.
         </p>
         <p className="mt-2 text-[13px] text-muted-foreground">
-          Where this is used: this convergence argument is exactly why PageRank (section 1.27)
+          Where this is used: this convergence argument is exactly why PageRank (section 1.28)
           reliably converges regardless of the enormous size of the web graph, and why the
           convergence can stall badly on graphs where the top two eigenvalues happen to be close
           together (a known practical failure mode of naive power iteration).
@@ -685,7 +685,7 @@ export function PowerIteration() {
         title="Practical example — power iteration from scratch"
         code={`import numpy as np
 
-A = np.array([[3., 1.], [0., 1.]])   # dominant eigenvalue is 3
+A = np.array([[3., 1.], [1., 3.]])   # symmetric, dominant eigenvalue is 4
 
 v = np.random.rand(2)
 v /= np.linalg.norm(v)
@@ -695,7 +695,7 @@ for i in range(20):
     v /= np.linalg.norm(v)
 
 eigenvalue_estimate = v @ A @ v   # Rayleigh quotient
-print(v, eigenvalue_estimate)     # converges to [1, 0]-ish direction, eigenvalue ~ 3
+print(v, eigenvalue_estimate)     # converges to [0.707, 0.707]-ish direction, eigenvalue ~ 4
 
 # Sanity check against the exact answer:
 eigvals, eigvecs = np.linalg.eig(A)
@@ -709,7 +709,7 @@ print(eigvals)`}
       <SectionBlock id="example" label="Real-world examples" tone="good">
         <ul>
           <li>
-            <strong>PageRank</strong> (section 1.27) is power iteration applied to a web link matrix
+            <strong>PageRank</strong> (section 1.28) is power iteration applied to a web link matrix
             — exactly this algorithm, at a scale of billions of pages.
           </li>
           <li>
@@ -719,7 +719,7 @@ print(eigvals)`}
           </li>
           <li>
             Estimating a neural network's largest weight-matrix singular value (relevant to spectral
-            normalization, section 1.19) in practice uses a fast one-step power-iteration
+            normalization, section 1.20) in practice uses a fast one-step power-iteration
             approximation rather than a full SVD, for speed.
           </li>
         </ul>
@@ -780,7 +780,7 @@ export function KernelMethods() {
         <p>
           <strong>Advanced:</strong> which functions are valid as kernels is governed by{" "}
           <strong>Mercer's theorem</strong>: a function is a valid kernel exactly when the matrix it
-          produces over any set of points is positive semi-definite (section 1.14) — connecting
+          produces over any set of points is positive semi-definite (section 1.15) — connecting
           kernel methods directly back to the PD-matrix theory from earlier in this chapter.
         </p>
       </SectionBlock>
@@ -845,7 +845,7 @@ print("linear accuracy:", linear_svm.score(X, y))     # poor, close to chance
 rbf_svm = SVC(kernel='rbf').fit(X, y)
 print("RBF accuracy:", rbf_svm.score(X, y))            # ~1.0
 
-# The kernel matrix itself is exactly the PD matrix from section 1.14:
+# The kernel matrix itself is exactly the PD matrix from section 1.15:
 from sklearn.metrics.pairwise import rbf_kernel
 K = rbf_kernel(X)
 print(np.all(np.linalg.eigvalsh(K) >= -1e-8))          # True -> PSD, as Mercer's theorem requires`}
@@ -864,12 +864,13 @@ print(np.all(np.linalg.eigvalsh(K) >= -1e-8))          # True -> PSD, as Mercer'
             existed.
           </li>
           <li>
-            <strong>Gaussian processes</strong> (section 1.14) are defined entirely in terms of a
+            <strong>Gaussian processes</strong> (section 1.15) are defined entirely in terms of a
             kernel function specifying covariance between any two input points.
           </li>
           <li>
-            <strong>Kernel PCA</strong> performs the PCA of section 1.9 in an implicit, non-linearly
-            lifted feature space, capturing non-linear structure that ordinary PCA cannot.
+            <strong>Kernel PCA</strong> performs the PCA of section 1.10 in an implicit,
+            non-linearly lifted feature space, capturing non-linear structure that ordinary PCA
+            cannot.
           </li>
         </ul>
       </SectionBlock>
@@ -919,7 +920,7 @@ export function Whitening() {
         </p>
         <p>
           <strong>Intermediate:</strong> the recipe uses the tools from earlier sections directly:
-          eigendecompose (section 1.6) the data's covariance matrix to find its principal axes, then
+          eigendecompose (section 1.7) the data's covariance matrix to find its principal axes, then
           rescale along each axis by <code>1/√λᵢ</code> — dividing out exactly the amount of spread
           that axis originally had.
         </p>
@@ -937,7 +938,7 @@ export function Whitening() {
         <p className="mt-1.5 text-[13.5px] text-muted-foreground">
           <Formula display={false}>{"\\Sigma^{-1/2}"}</Formula> is computed from the covariance
           matrix's eigendecomposition: <code>Σ = VΛVᵀ</code> gives <code>Σ⁻¹ᐟ² = VΛ⁻¹ᐟ²Vᵀ</code> — a
-          direct, practical use of the material from section 1.6.
+          direct, practical use of the material from section 1.7.
         </p>
       </SectionBlock>
       <Derivation
@@ -1003,7 +1004,7 @@ print(np.cov(X_whitened.T))   # ~identity matrix: unit variance, zero correlatio
       >
         <p>
           Note the small <code>+ 1e-8</code> — a direct application of the "jitter" trick from
-          section 1.14, needed because a real covariance matrix can have a tiny near-zero eigenvalue
+          section 1.15, needed because a real covariance matrix can have a tiny near-zero eigenvalue
           that would otherwise blow up the <code>1/√λ</code> scaling.
         </p>
       </CodeExample>
@@ -1042,7 +1043,7 @@ print(np.cov(X_whitened.T))   # ~identity matrix: unit variance, zero correlatio
       </Pitfall>
       <ExpertNote>
         <p>
-          Whitening is the same eigen-decomposition machinery as PCA (section 1.6, 1.9), just
+          Whitening is the same eigen-decomposition machinery as PCA (section 1.7, 1.10), just
           followed by an extra rescaling step — which is why it's often described as "PCA, then
           normalize each component."
         </p>
@@ -1051,7 +1052,7 @@ print(np.cov(X_whitened.T))   # ~identity matrix: unit variance, zero correlatio
           samples can badly amplify estimation noise in the smallest eigenvalue directions (since
           dividing by a poorly estimated small number is numerically unstable) — in practice,
           whitening is often combined with dimensionality reduction (dropping the
-          smallest-eigenvalue directions entirely, section 1.9) rather than applied to every
+          smallest-eigenvalue directions entirely, section 1.10) rather than applied to every
           direction indiscriminately.
         </p>
       </ExpertNote>
@@ -1070,7 +1071,7 @@ export function WoodburyIdentity() {
           shortcut, specifically for matrix inverses.
         </p>
         <p>
-          <strong>Beginner:</strong> inverting a matrix (section 1.5) is expensive — roughly{" "}
+          <strong>Beginner:</strong> inverting a matrix (section 1.6) is expensive — roughly{" "}
           <code>O(n³)</code>. But what if you already have the inverse of a matrix, and you only
           need to update it slightly (say, adding one new data point to a dataset)? Recomputing the
           whole inverse from scratch every time would be wasteful.
@@ -1189,12 +1190,12 @@ print(np.allclose(A_new_inv_direct, A_new_inv_fast))   # True, much cheaper to c
           <li>
             <strong>Online/recursive least squares</strong> updates a regression model's solution as
             new data streams in, without recomputing the full normal-equation inverse from section
-            1.5 each time.
+            1.6 each time.
           </li>
           <li>
             <strong>Gaussian process</strong> libraries use Woodbury-style updates to add new
             training points incrementally, avoiding a full <code>O(n³)</code> Cholesky
-            refactorization (section 1.14) every time.
+            refactorization (section 1.15) every time.
           </li>
         </ul>
       </SectionBlock>
@@ -1237,15 +1238,15 @@ export function PerronFrobenius() {
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
           <strong>The one-sentence idea:</strong> this lesson answers a "wait, why does that
-          actually work?" question left hanging by section 1.23 — it's the theorem that guarantees
+          actually work?" question left hanging by section 1.24 — it's the theorem that guarantees
           PageRank (and anything else built on power iteration over non-negative data) has a real,
           unique answer at all, rather than a coin's chance of returning nonsense.
         </p>
         <p>
-          <strong>Beginner:</strong> section 1.23's power iteration algorithm quietly assumed
+          <strong>Beginner:</strong> section 1.24's power iteration algorithm quietly assumed
           something important: that a single, dominant, real, positive eigenvalue actually exists to
           converge to. For a general matrix, eigenvalues can be negative or even complex (section
-          1.6) — so why does this always work out for something like PageRank?
+          1.7) — so why does this always work out for something like PageRank?
         </p>
         <p>
           <strong>Intermediate:</strong> the <strong>Perron-Frobenius theorem</strong> answers this
@@ -1345,7 +1346,7 @@ google_matrix = d * M + (1 - d) / n * np.ones((n, n))   # damping guarantees Per
 
 scores = np.ones(n) / n
 for _ in range(50):
-    scores = google_matrix @ scores   # power iteration (section 1.23)
+    scores = google_matrix @ scores   # power iteration (section 1.24)
 
 print(scores, scores.sum())   # converges to a unique, all-positive distribution`}
       >

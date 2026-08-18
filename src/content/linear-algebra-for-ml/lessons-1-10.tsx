@@ -22,6 +22,104 @@ import {
   renderSvdMorph,
 } from "./diagrams-1-10";
 
+export function Introduction() {
+  return (
+    <>
+      <SectionBlock id="welcome" label="Welcome">
+        <p>
+          This chapter builds the linear algebra behind machine learning from the ground up —
+          starting with a single arrow on a page and ending, 34 lessons later, with the tools behind
+          PageRank, kernel SVMs, conjugate gradient solvers, and normalizing-flow generative models.
+          Every idea is built on the ones before it: nothing here is presented as a rule to memorize
+          without first showing why it has to be true.
+        </p>
+        <p>
+          It's written for three overlapping audiences at once — a beginner meeting vectors and
+          matrices for the first time, an intermediate reader who's used these tools but wants the
+          "why" behind them, and an advanced reader who wants the actual theorems, proofs, and
+          numerical caveats that production ML code quietly depends on. Every lesson is written in
+          all three registers, so you can read at whichever level matches a given topic for you and
+          go deeper exactly where you need to.
+        </p>
+      </SectionBlock>
+      <SectionBlock id="how-to-read" label="How every lesson is structured" tone="muted">
+        <p>
+          Each of the 34 lessons that follow uses the same consistent shape, so you always know
+          where to look for what you need:
+        </p>
+        <ul>
+          <li>
+            <strong>In plain English</strong> — the idea explained three times, at increasing depth
+            (beginner → intermediate → advanced), with no formulas required to follow along.
+          </li>
+          <li>
+            <strong>Formula</strong> — the precise mathematical statement, in standard notation.
+          </li>
+          <li>
+            <strong>Derivation</strong> — a full proof or worked derivation of the formula, plus a
+            "where this is used" note connecting it to a real ML system.
+          </li>
+          <li>
+            <strong>Diagram</strong> — most lessons include a live, draggable diagram you can
+            manipulate directly, rather than a static picture.
+          </li>
+          <li>
+            <strong>Practical example</strong> — runnable NumPy/PyTorch/scikit-learn code showing
+            the idea used the way you'd actually use it.
+          </li>
+          <li>
+            <strong>Real-world examples, common mistakes, and going deeper</strong> — where the idea
+            shows up in production systems, what trips people up in practice, and an optional deeper
+            dive for readers who want more.
+          </li>
+        </ul>
+      </SectionBlock>
+      <SectionBlock id="notation" label="Notation used throughout this chapter" tone="formula">
+        <p>A small, consistent set of conventions is used in every lesson:</p>
+        <ul>
+          <li>
+            Lowercase letters (<code>x</code>, <code>v</code>) are <strong>vectors</strong>;
+            uppercase letters (<code>A</code>, <code>B</code>) are <strong>matrices</strong>; plain
+            lowercase italics (<code>a</code>, <code>λ</code>) are <strong>scalars</strong>.
+          </li>
+          <li>
+            <Formula display={false}>{"A^T"}</Formula> is the <strong>transpose</strong> (section
+            1.6), <Formula display={false}>{"A^{-1}"}</Formula> is the <strong>inverse</strong>{" "}
+            (also section 1.6), and <code>Aᵢⱼ</code> means the entry in row i, column j.
+          </li>
+          <li>
+            <Formula display={false}>{"\\|v\\|"}</Formula> is a <strong>norm</strong> (section 1.8,
+            length/size of a vector or matrix), and <code>v·w</code> is the{" "}
+            <strong>dot product</strong> (section 1.3).
+          </li>
+          <li>
+            <Formula display={false}>{"\\nabla f"}</Formula> is the <strong>gradient</strong> of a
+            scalar function (section 1.17), and <Formula display={false}>{"\\Sigma"}</Formula>{" "}
+            outside a matrix name means summation; as a matrix name (as in <code>Σ = VΛVᵀ</code>) it
+            means something specific to that lesson and is always defined on the spot.
+          </li>
+        </ul>
+      </SectionBlock>
+      <SectionBlock id="prerequisites" label="Prerequisites" tone="good">
+        <p>
+          Comfort with basic algebra (solving for x, working with exponents) and functions is all
+          that's assumed going in. A little single-variable calculus (what a derivative means) helps
+          for the "Advanced" paragraphs and the "Going deeper" boxes in the later lessons, but is
+          never required to follow a lesson's main thread — every calculus-dependent idea is
+          explained again from scratch the first time it's needed.
+        </p>
+      </SectionBlock>
+      <Takeaway>
+        <p>
+          Start with section 1.2, <em>What is a Vector?</em>, and move through the chapter in order
+          — each lesson builds directly on the ones before it, all the way to the final lesson on
+          normalizing flows, which uses ideas from nearly every earlier section at once.
+        </p>
+      </Takeaway>
+    </>
+  );
+}
+
 export function WhatIsAVector() {
   return (
     <>
@@ -50,7 +148,7 @@ export function WhatIsAVector() {
           can't draw it anymore, only compute with it. The math doesn't care how many dimensions
           there are; only your intuition needs the 2D/3D training wheels. Formally, the set of all
           n-dimensional real vectors forms a <strong>vector space</strong>, ℝⁿ — a structure closed
-          under addition and scalar multiplication, which is the entire subject of section 1.8.
+          under addition and scalar multiplication, which is the entire subject of section 1.9.
         </p>
       </SectionBlock>
       <SectionBlock id="formula" label="Formula" tone="formula">
@@ -64,10 +162,13 @@ export function WhatIsAVector() {
           shapes as meaningfully different for matrix multiplication, so watch for it later.
         </p>
       </SectionBlock>
-      <Derivation id="derivation" title="Theorem: every vector is a unique combination of basis vectors">
+      <Derivation
+        id="derivation"
+        title="Theorem: every vector is a unique combination of basis vectors"
+      >
         <p>
-          Define the standard basis vectors <code>e₁ = [1,0,…,0]</code>, <code>e₂ = [0,1,…,0]</code>,
-          …, <code>eₙ = [0,0,…,1]</code> — each a 1 in one position, zeros elsewhere.
+          Define the standard basis vectors <code>e₁ = [1,0,…,0]</code>, <code>e₂ = [0,1,…,0]</code>
+          , …, <code>eₙ = [0,0,…,1]</code> — each a 1 in one position, zeros elsewhere.
         </p>
         <p>
           <strong>Claim:</strong> any vector <code>v = [v₁, v₂, …, vₙ]</code> can be written as{" "}
@@ -76,19 +177,20 @@ export function WhatIsAVector() {
         <p>
           <strong>Existence:</strong> compute the right-hand side component by component. The i-th
           component of <code>v₁e₁ + ⋯ + vₙeₙ</code> is <code>vᵢ · 1 = vᵢ</code> (every other term
-          contributes 0 in that position, since eⱼ is zero everywhere except position j). This matches{" "}
-          <code>v</code> exactly in every position, so the sum equals v.
+          contributes 0 in that position, since eⱼ is zero everywhere except position j). This
+          matches <code>v</code> exactly in every position, so the sum equals v.
         </p>
         <p>
           <strong>Uniqueness:</strong> suppose also <code>v = c₁e₁ + ⋯ + cₙeₙ</code> for some other
-          coefficients. Looking at component i of both sides gives <code>vᵢ = cᵢ</code> for every i —
-          so the coefficients must be exactly v's own components. No other combination works.
+          coefficients. Looking at component i of both sides gives <code>vᵢ = cᵢ</code> for every i
+          — so the coefficients must be exactly v's own components. No other combination works.
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this is the formal justification for treating "the
           vector" and "its list of coordinates" as interchangeable — every basis (not just the
-          standard one) gives a similarly unique representation, which is exactly the property section
-          1.13 (Gram-Schmidt) and PCA (section 1.9) both rely on when changing to a more useful basis.
+          standard one) gives a similarly unique representation, which is exactly the property
+          section 1.14 (Gram-Schmidt) and PCA (section 1.10) both rely on when changing to a more
+          useful basis.
         </p>
       </Derivation>
       <DiagramBlock
@@ -149,7 +251,7 @@ print(house * 2)      # scale every entry: [3000, 6, 20]`}
         <ul>
           <li>
             Confusing a vector's <em>length</em> (number of entries) with its <em>norm</em>{" "}
-            (geometric size, see 1.7) — "length" in ML almost always means dimensionality, not
+            (geometric size, see 1.8) — "length" in ML almost always means dimensionality, not
             magnitude.
           </li>
           <li>
@@ -174,7 +276,7 @@ print(house * 2)      # scale every entry: [3000, 6, 20]`}
           <code>.shape</code> before trusting the math.
         </p>
         <p>
-          At the master level: the choice of <em>basis</em> (section 1.8) used to represent a vector
+          At the master level: the choice of <em>basis</em> (section 1.9) used to represent a vector
           as coordinates is arbitrary — the vector itself is a basis-independent geometric object.
           Changing basis (a "change-of-basis matrix") re-expresses the exact same vector with
           different numbers, which is precisely what happens internally during PCA and whitening
@@ -244,11 +346,26 @@ export function VectorOperations() {
           Start from the <strong>Law of Cosines</strong> applied to the triangle formed by a, b, and
           the vector a−b, with θ the angle between a and b:
         </p>
-        <Formula>{"\\|\\vec{a}-\\vec{b}\\|^2 = \\|\\vec{a}\\|^2 + \\|\\vec{b}\\|^2 - 2\\|\\vec{a}\\|\\|\\vec{b}\\|\\cos\\theta"}</Formula>
-        <p>Now expand the same left-hand side purely algebraically, using the dot product's own definition:</p>
-        <Formula>{"\\|\\vec{a}-\\vec{b}\\|^2 = (\\vec{a}-\\vec{b})\\cdot(\\vec{a}-\\vec{b}) = \\|\\vec{a}\\|^2 - 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"}</Formula>
+        <Formula>
+          {
+            "\\|\\vec{a}-\\vec{b}\\|^2 = \\|\\vec{a}\\|^2 + \\|\\vec{b}\\|^2 - 2\\|\\vec{a}\\|\\|\\vec{b}\\|\\cos\\theta"
+          }
+        </Formula>
+        <p>
+          Now expand the same left-hand side purely algebraically, using the dot product's own
+          definition:
+        </p>
+        <Formula>
+          {
+            "\\|\\vec{a}-\\vec{b}\\|^2 = (\\vec{a}-\\vec{b})\\cdot(\\vec{a}-\\vec{b}) = \\|\\vec{a}\\|^2 - 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"
+          }
+        </Formula>
         <p>Both expressions equal the same quantity, so their right-hand sides are equal:</p>
-        <Formula>{"\\|\\vec{a}\\|^2 + \\|\\vec{b}\\|^2 - 2\\|\\vec{a}\\|\\|\\vec{b}\\|\\cos\\theta = \\|\\vec{a}\\|^2 - 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"}</Formula>
+        <Formula>
+          {
+            "\\|\\vec{a}\\|^2 + \\|\\vec{b}\\|^2 - 2\\|\\vec{a}\\|\\|\\vec{b}\\|\\cos\\theta = \\|\\vec{a}\\|^2 - 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"
+          }
+        </Formula>
         <p>
           The <code>‖a‖²</code> and <code>‖b‖²</code> terms cancel from both sides, leaving{" "}
           <code>−2‖a‖‖b‖cosθ = −2 a·b</code>, and dividing by −2 gives exactly{" "}
@@ -256,9 +373,9 @@ export function VectorOperations() {
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this identity is the entire justification for cosine
-          similarity (used above) and for every "attention score" computation in Transformers (section
-          1.2's expert note) — it's what lets a pure dot product stand in for "how aligned are these
-          two directions" without ever computing an angle directly.
+          similarity (used above) and for every "attention score" computation in Transformers
+          (section 1.3's expert note) — it's what lets a pure dot product stand in for "how aligned
+          are these two directions" without ever computing an angle directly.
         </p>
       </Derivation>
       <DiagramBlock
@@ -382,7 +499,7 @@ print(round(cosine_sim, 3))               # 0.789 -> fairly similar direction
         <p>
           At the master level: a set of mutually orthogonal <em>unit</em> vectors is called{" "}
           <strong>orthonormal</strong> — the columns of every rotation matrix and every U/V matrix
-          in an SVD (section 1.9) are orthonormal by construction, which is exactly what guarantees
+          in an SVD (section 1.10) are orthonormal by construction, which is exactly what guarantees
           those matrices preserve lengths and angles (they never distort space, only reorient it).
         </p>
       </ExpertNote>
@@ -440,25 +557,25 @@ export function WhatIsAMatrix() {
         <p>
           <strong>Claim:</strong> for any matrix A and vectors x, y and scalar c,{" "}
           <code>A(x+y) = Ax + Ay</code> and <code>A(cx) = c(Ax)</code> — the two properties that
-          define a <em>linear</em> map, which is exactly why "matrix" and "linear transformation" are
-          treated as the same idea throughout this chapter.
+          define a <em>linear</em> map, which is exactly why "matrix" and "linear transformation"
+          are treated as the same idea throughout this chapter.
         </p>
         <p>
-          <strong>Proof:</strong> row i of <code>A(x+y)</code> is the dot product of A's i-th row with{" "}
-          <code>x+y</code>:
+          <strong>Proof:</strong> row i of <code>A(x+y)</code> is the dot product of A's i-th row
+          with <code>x+y</code>:
         </p>
         <Formula>{"\\sum_j a_{ij}(x_j+y_j) = \\sum_j a_{ij}x_j + \\sum_j a_{ij}y_j"}</Formula>
         <p>
-          — using ordinary distributivity of multiplication over addition, term by term. The first sum
-          is exactly row i of <code>Ax</code>, and the second is row i of <code>Ay</code>. Since this
-          holds for every row i, <code>A(x+y) = Ax + Ay</code>. The scalar case is even shorter: row i
-          of <code>A(cx)</code> is <code>Σⱼ aᵢⱼ(cxⱼ) = c Σⱼ aᵢⱼxⱼ</code>, which is exactly c times row
-          i of <code>Ax</code>.
+          — using ordinary distributivity of multiplication over addition, term by term. The first
+          sum is exactly row i of <code>Ax</code>, and the second is row i of <code>Ay</code>. Since
+          this holds for every row i, <code>A(x+y) = Ax + Ay</code>. The scalar case is even
+          shorter: row i of <code>A(cx)</code> is <code>Σⱼ aᵢⱼ(cxⱼ) = c Σⱼ aᵢⱼxⱼ</code>, which is
+          exactly c times row i of <code>Ax</code>.
         </p>
         <p className="text-muted-foreground">
-          <strong>Where this is used:</strong> linearity is precisely what makes a neural network layer
-          (section 1.4) predictable and differentiable in closed form — every "linear layer" in every
-          framework is called that specifically because it satisfies this theorem.
+          <strong>Where this is used:</strong> linearity is precisely what makes a neural network
+          layer (section 1.5) predictable and differentiable in closed form — every "linear layer"
+          in every framework is called that specifically because it satisfies this theorem.
         </p>
       </Derivation>
       <DiagramBlock
@@ -588,20 +705,35 @@ export function MatrixOperations() {
           this for every combination of row and column and you have the full product.
         </p>
       </SectionBlock>
-      <Derivation id="derivation" title="Theorem: matrix multiplication is associative — (AB)C = A(BC)">
+      <Derivation
+        id="derivation"
+        title="Theorem: matrix multiplication is associative — (AB)C = A(BC)"
+      >
         <p>
           Write both sides in index notation and expand using the definition above. Entry (i, l) of{" "}
           <code>(AB)C</code>:
         </p>
-        <Formula>{"[(AB)C]_{il} = \\sum_k (AB)_{ik}C_{kl} = \\sum_k \\left(\\sum_j A_{ij}B_{jk}\\right) C_{kl}"}</Formula>
-        <p>Multiply through and swap the (finite) order of summation — always valid for finite sums:</p>
-        <Formula>{"= \\sum_j \\sum_k A_{ij}B_{jk}C_{kl} = \\sum_j A_{ij} \\left(\\sum_k B_{jk}C_{kl}\\right) = \\sum_j A_{ij}(BC)_{jl} = [A(BC)]_{il}"}</Formula>
-        <p>Since this holds for every entry (i, l), the two matrices are identical: (AB)C = A(BC).</p>
+        <Formula>
+          {
+            "[(AB)C]_{il} = \\sum_k (AB)_{ik}C_{kl} = \\sum_k \\left(\\sum_j A_{ij}B_{jk}\\right) C_{kl}"
+          }
+        </Formula>
+        <p>
+          Multiply through and swap the (finite) order of summation — always valid for finite sums:
+        </p>
+        <Formula>
+          {
+            "= \\sum_j \\sum_k A_{ij}B_{jk}C_{kl} = \\sum_j A_{ij} \\left(\\sum_k B_{jk}C_{kl}\\right) = \\sum_j A_{ij}(BC)_{jl} = [A(BC)]_{il}"
+          }
+        </Formula>
+        <p>
+          Since this holds for every entry (i, l), the two matrices are identical: (AB)C = A(BC).
+        </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> associativity is why a deep network's layers can be
-          grouped and composed in any order without changing the result, and why libraries can freely
-          choose the cheapest evaluation order for a long chain of matrix products (exactly the
-          contraction-ordering question raised in section 1.17's expert note).
+          grouped and composed in any order without changing the result, and why libraries can
+          freely choose the cheapest evaluation order for a long chain of matrix products (exactly
+          the contraction-ordering question raised in section 1.18's expert note).
         </p>
       </Derivation>
       <SectionBlock id="worked" label="Worked examples" tone="muted">
@@ -610,7 +742,7 @@ export function MatrixOperations() {
       <DiagramBlock
         id="diagram"
         title="Interactive matrix × vector"
-        caption="Edit A or v directly — the highlighted-row/column intuition from 1.3 is exactly what's happening under the hood."
+        caption="Edit A or v directly — the highlighted-row/column intuition from 1.4 is exactly what's happening under the hood."
       >
         <DiagramHost render={renderMatrixMultiply} />
       </DiagramBlock>
@@ -720,7 +852,7 @@ export function TransposeIdentityInverse() {
         </p>
         <p>
           <strong>Advanced:</strong> not every matrix has an inverse — only square matrices can, and
-          even among those, only ones whose rows/columns are all independent (section 1.8). When an
+          even among those, only ones whose rows/columns are all independent (section 1.9). When an
           inverse doesn't exist, you can't uniquely "undo" the transformation because information
           was destroyed along the way (multiple different inputs got mapped to the same output).
           This is precisely the geometric meaning of a matrix being "singular."
@@ -730,27 +862,27 @@ export function TransposeIdentityInverse() {
         <Formula>{"AA^{-1} = A^{-1}A = I"}</Formula>
         <p className="mt-1.5 text-[13.5px] text-muted-foreground">
           Only square matrices can have an inverse — and even then, not all of them do (a "singular"
-          matrix has none, typically because its rows or columns are redundant — see section 1.8 on
+          matrix has none, typically because its rows or columns are redundant — see section 1.9 on
           rank). A matrix's transpose always exists, for any shape: transposing an m×n matrix gives
           an n×m matrix.
         </p>
       </SectionBlock>
       <Derivation id="derivation" title="Theorem: (AB)⁻¹ = B⁻¹A⁻¹ (the 'socks and shoes' rule)">
         <p>
-          <strong>Claim:</strong> if A and B are both invertible, then AB is invertible and its inverse
-          is B⁻¹A⁻¹ — note the order flips, exactly like undoing "put on socks, then shoes" by first
-          removing shoes, then socks.
+          <strong>Claim:</strong> if A and B are both invertible, then AB is invertible and its
+          inverse is B⁻¹A⁻¹ — note the order flips, exactly like undoing "put on socks, then shoes"
+          by first removing shoes, then socks.
         </p>
         <p>
-          <strong>Proof:</strong> to show B⁻¹A⁻¹ really is the inverse of AB, it's enough to check it
-          satisfies the defining property directly — multiply them together and confirm the result is
-          the identity:
+          <strong>Proof:</strong> to show B⁻¹A⁻¹ really is the inverse of AB, it's enough to check
+          it satisfies the defining property directly — multiply them together and confirm the
+          result is the identity:
         </p>
         <Formula>{"(AB)(B^{-1}A^{-1}) = A(BB^{-1})A^{-1} = A I A^{-1} = AA^{-1} = I"}</Formula>
         <p>
-          using associativity (proved in section 1.4) to regroup the middle product first. The same
-          check in the other order, <code>(B⁻¹A⁻¹)(AB) = B⁻¹(A⁻¹A)B = B⁻¹IB = B⁻¹B = I</code>, confirms
-          it from both sides, which is exactly what "is the inverse" requires.
+          using associativity (proved in section 1.5) to regroup the middle product first. The same
+          check in the other order, <code>(B⁻¹A⁻¹)(AB) = B⁻¹(A⁻¹A)B = B⁻¹IB = B⁻¹B = I</code>,
+          confirms it from both sides, which is exactly what "is the inverse" requires.
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this rule is why, when undoing a sequence of
@@ -820,16 +952,16 @@ except np.linalg.LinAlgError as e:
           </li>
           <li>
             Assuming every square matrix is invertible — always check for singularity (or rank
-            deficiency, section 1.8) before relying on an inverse existing.
+            deficiency, section 1.9) before relying on an inverse existing.
           </li>
         </ul>
       </Pitfall>
       <ExpertNote>
         <p>
           Real ML libraries rarely compute a literal inverse for large problems — it's numerically
-          unstable and slow. They use decompositions like <strong>LU</strong> (section 1.12),{" "}
-          <strong>QR</strong> (section 1.13), or <strong>SVD</strong> (section 1.9) instead, or just
-          solve iteratively with gradient descent.
+          unstable and slow. They use decompositions like <strong>LU</strong> (section 1.13),{" "}
+          <strong>QR</strong> (section 1.14), or <strong>SVD</strong> (section 1.10) instead, or
+          just solve iteratively with gradient descent.
         </p>
         <p>
           A useful mental shortcut: for an orthogonal matrix (one whose rows/columns are unit
@@ -841,7 +973,7 @@ except np.linalg.LinAlgError as e:
         <p>
           At the master level: when a true inverse doesn't exist (non-square or singular matrices),
           the <strong>Moore-Penrose pseudo-inverse</strong> (<code>np.linalg.pinv</code>)
-          generalizes the concept, built from the SVD (section 1.9) — it's what "least squares"
+          generalizes the concept, built from the SVD (section 1.10) — it's what "least squares"
           solutions actually rely on under the hood in every serious numerical library.
         </p>
       </ExpertNote>
@@ -884,32 +1016,36 @@ export function EigenvaluesEigenvectors() {
         </p>
       </SectionBlock>
       <Derivation id="derivation" title="Derivation: where the characteristic equation comes from">
+        <p>Start directly from the definition and move everything to one side:</p>
+        <Formula>
+          {
+            "A\\vec{v} = \\lambda\\vec{v} \\ \\Longrightarrow\\ A\\vec{v} - \\lambda\\vec{v} = 0 \\ \\Longrightarrow\\ (A-\\lambda I)\\vec{v} = 0"
+          }
+        </Formula>
         <p>
-          Start directly from the definition and move everything to one side:
-        </p>
-        <Formula>{"A\\vec{v} = \\lambda\\vec{v} \\ \\Longrightarrow\\ A\\vec{v} - \\lambda\\vec{v} = 0 \\ \\Longrightarrow\\ (A-\\lambda I)\\vec{v} = 0"}</Formula>
-        <p>
-          (inserting the identity matrix, section 1.5, so both terms are genuine matrix-vector
+          (inserting the identity matrix, section 1.6, so both terms are genuine matrix-vector
           products that can be factored together). This says v is in the null space of{" "}
-          <code>A − λI</code> — but eigenvectors are required to be <em>nonzero</em> by definition. A
-          matrix has a nonzero vector in its null space exactly when it's singular (section 1.8, 1.11),
-          i.e. exactly when its determinant is zero:
+          <code>A − λI</code> — but eigenvectors are required to be <em>nonzero</em> by definition.
+          A matrix has a nonzero vector in its null space exactly when it's singular (section 1.9,
+          1.12), i.e. exactly when its determinant is zero:
         </p>
         <Formula>{"\\det(A - \\lambda I) = 0"}</Formula>
         <p>
-          For a 2×2 matrix <code>A = [[a,b],[c,d]]</code>, expanding this determinant gives a concrete
-          quadratic in λ:
+          For a 2×2 matrix <code>A = [[a,b],[c,d]]</code>, expanding this determinant gives a
+          concrete quadratic in λ:
         </p>
-        <Formula>{"(a-\\lambda)(d-\\lambda) - bc = \\lambda^2 - (a+d)\\lambda + (ad-bc) = 0"}</Formula>
+        <Formula>
+          {"(a-\\lambda)(d-\\lambda) - bc = \\lambda^2 - (a+d)\\lambda + (ad-bc) = 0"}
+        </Formula>
         <p>
-          solvable directly by the quadratic formula — for the worked example below (a=2, b=c=0, d=3),
-          this becomes <code>λ² − 5λ + 6 = 0 = (λ−2)(λ−3)</code>, giving exactly λ=2 and λ=3.
+          solvable directly by the quadratic formula — for the worked example below (a=2, b=c=0,
+          d=3), this becomes <code>λ² − 5λ + 6 = 0 = (λ−2)(λ−3)</code>, giving exactly λ=2 and λ=3.
         </p>
         <p className="text-muted-foreground">
-          <strong>Where this is used:</strong> in practice, no library solves this polynomial equation
-          for matrices larger than 2×2 or 3×3 — it's numerically unreliable at scale. Real eigensolvers
-          use the QR algorithm (section 1.13) or power iteration (section 1.23) instead; this
-          derivation is the "why it's true," not the "how it's computed."
+          <strong>Where this is used:</strong> in practice, no library solves this polynomial
+          equation for matrices larger than 2×2 or 3×3 — it's numerically unreliable at scale. Real
+          eigensolvers use the QR algorithm (section 1.14) or power iteration (section 1.24)
+          instead; this derivation is the "why it's true," not the "how it's computed."
         </p>
       </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
@@ -965,7 +1101,7 @@ for i in range(len(eigenvalues)):
             — the directions of maximum variance. This is how you compress 100 correlated features
             (or a 10,000-pixel face image, "Eigenfaces") down to a handful of numbers. When you also
             have class labels and want directions that separate categories rather than just spread
-            out variance, that's the generalized eigenvalue problem of section 1.28 (LDA).
+            out variance, that's the generalized eigenvalue problem of section 1.29 (LDA).
           </li>
           <li>
             <strong>PageRank</strong> is, at its heart, finding the eigenvector of the web's link
@@ -996,7 +1132,7 @@ for i in range(len(eigenvalues)):
       </Pitfall>
       <ExpertNote>
         <p>
-          <strong>SVD</strong> (section 1.9) generalizes eigen-decomposition to non-square matrices
+          <strong>SVD</strong> (section 1.10) generalizes eigen-decomposition to non-square matrices
           and underlies matrix-factorization recommenders and NLP topic models.
         </p>
         <p>
@@ -1015,7 +1151,7 @@ for i in range(len(eigenvalues)):
           that dominate ML — the spectral theorem guarantees every real symmetric matrix
           diagonalizes cleanly with orthogonal eigenvectors, which is precisely why PCA always works
           without exception. Symmetric matrices whose eigenvalues are all strictly positive are
-          exactly the <strong>positive definite matrices</strong> of section 1.14 — the two topics
+          exactly the <strong>positive definite matrices</strong> of section 1.15 — the two topics
           are two views of the same object.
         </p>
       </ExpertNote>
@@ -1063,13 +1199,21 @@ export function VectorNorms() {
       </SectionBlock>
       <Derivation id="derivation" title="Derivation: the triangle inequality, ‖a+b‖ ≤ ‖a‖+‖b‖">
         <p>Expand the squared L2 norm of a sum using the dot product directly:</p>
-        <Formula>{"\\|\\vec{a}+\\vec{b}\\|^2 = (\\vec{a}+\\vec{b})\\cdot(\\vec{a}+\\vec{b}) = \\|\\vec{a}\\|^2 + 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"}</Formula>
+        <Formula>
+          {
+            "\\|\\vec{a}+\\vec{b}\\|^2 = (\\vec{a}+\\vec{b})\\cdot(\\vec{a}+\\vec{b}) = \\|\\vec{a}\\|^2 + 2\\,\\vec{a}\\cdot\\vec{b} + \\|\\vec{b}\\|^2"
+          }
+        </Formula>
         <p>
-          The <strong>Cauchy-Schwarz inequality</strong> states <code>a·b ≤ ‖a‖‖b‖</code> for any two
-          vectors (a direct consequence of section 1.2's identity, since{" "}
-          <code>cos θ ≤ 1</code> always). Substituting this bound in:
+          The <strong>Cauchy-Schwarz inequality</strong> states <code>a·b ≤ ‖a‖‖b‖</code> for any
+          two vectors (a direct consequence of section 1.3's identity, since <code>cos θ ≤ 1</code>{" "}
+          always). Substituting this bound in:
         </p>
-        <Formula>{"\\|\\vec{a}+\\vec{b}\\|^2 \\le \\|\\vec{a}\\|^2 + 2\\|\\vec{a}\\|\\|\\vec{b}\\| + \\|\\vec{b}\\|^2 = (\\|\\vec{a}\\|+\\|\\vec{b}\\|)^2"}</Formula>
+        <Formula>
+          {
+            "\\|\\vec{a}+\\vec{b}\\|^2 \\le \\|\\vec{a}\\|^2 + 2\\|\\vec{a}\\|\\|\\vec{b}\\| + \\|\\vec{b}\\|^2 = (\\|\\vec{a}\\|+\\|\\vec{b}\\|)^2"
+          }
+        </Formula>
         <p>
           and since norms are non-negative, taking the square root of both sides preserves the
           inequality: <code>‖a+b‖ ≤ ‖a‖+‖b‖</code>.
@@ -1077,8 +1221,8 @@ export function VectorNorms() {
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> the triangle inequality is one of the three defining
           axioms a function must satisfy to legally be called a "norm" or "distance metric" at all —
-          it's what guarantees "going directly somewhere is never longer than a detour," the property
-          every distance-based ML algorithm (k-NN, clustering) silently depends on.
+          it's what guarantees "going directly somewhere is never longer than a detour," the
+          property every distance-based ML algorithm (k-NN, clustering) silently depends on.
         </p>
       </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
@@ -1234,28 +1378,28 @@ export function VectorSpacesSpanBasisRank() {
       </SectionBlock>
       <Derivation id="derivation" title="Theorem: the Rank-Nullity theorem">
         <p>
-          For an m×n matrix A, define the <strong>null space</strong> as every input vector A sends to
-          zero (<code>{"{x : Ax = 0}"}</code>), and the <strong>nullity</strong> as that space's
+          For an m×n matrix A, define the <strong>null space</strong> as every input vector A sends
+          to zero (<code>{"{x : Ax = 0}"}</code>), and the <strong>nullity</strong> as that space's
           dimension. The theorem states:
         </p>
         <Formula>{"\\text{rank}(A) + \\text{nullity}(A) = n"}</Formula>
         <p>
-          <strong>Why:</strong> pick a basis for the null space (nullity vectors), then extend it to a
-          full basis of the entire n-dimensional input space by adding more vectors (always possible —
-          any independent set can be extended to a basis). Applying A to this extended basis: the
-          null-space vectors all map to 0, contributing nothing new, while the remaining vectors map to
-          a set that turns out to be exactly a basis for A's output (column) space — a short argument
-          shows they must be independent, since any dependency among their images would pull a nonzero
-          combination of them back into the null space, contradicting how they were chosen. So the
-          number of "leftover" basis vectors equals rank(A), and{" "}
+          <strong>Why:</strong> pick a basis for the null space (nullity vectors), then extend it to
+          a full basis of the entire n-dimensional input space by adding more vectors (always
+          possible — any independent set can be extended to a basis). Applying A to this extended
+          basis: the null-space vectors all map to 0, contributing nothing new, while the remaining
+          vectors map to a set that turns out to be exactly a basis for A's output (column) space —
+          a short argument shows they must be independent, since any dependency among their images
+          would pull a nonzero combination of them back into the null space, contradicting how they
+          were chosen. So the number of "leftover" basis vectors equals rank(A), and{" "}
           <code>nullity + rank = n</code> follows immediately by counting.
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this is the precise reason a rank-deficient matrix
-          (section 1.11's determinant-zero case) has a nontrivial null space — it directly explains why{" "}
-          <code>Ax = b</code> has infinitely many solutions (not zero, not exactly one) whenever A is
-          singular: the null space's dimension tells you exactly how many free directions of ambiguity
-          exist.
+          (section 1.12's determinant-zero case) has a nontrivial null space — it directly explains
+          why <code>Ax = b</code> has infinitely many solutions (not zero, not exactly one) whenever
+          A is singular: the null space's dimension tells you exactly how many free directions of
+          ambiguity exist.
         </p>
       </Derivation>
       <SectionBlock id="worked" label="Worked example" tone="muted">
@@ -1307,7 +1451,7 @@ print(np.linalg.matrix_rank(X))            # 1 -> pure duplicate information`}
             information (one is a linear function of the other) — together they only span a 1-D
             line, not a 2-D plane. This is <strong>multicollinearity</strong>, and it's exactly why{" "}
             <code>Xᵀ X</code> can become singular (impossible to invert) in the normal equation from
-            section 1.5, which is what motivates ridge regression's small diagonal correction.
+            section 1.6, which is what motivates ridge regression's small diagonal correction.
           </li>
           <li>
             Feature engineering pipelines routinely drop one-hot-encoded columns (e.g. keeping only
@@ -1348,7 +1492,7 @@ print(np.linalg.matrix_rank(X))            # 1 -> pure duplicate information`}
         <p>
           At the master level: rank is only well-defined exactly in infinite-precision arithmetic —
           in floating point, "numerical rank" is determined by counting singular values (section
-          1.9) above some small tolerance, since real-world data almost never produces an
+          1.10) above some small tolerance, since real-world data almost never produces an
           exactly-zero singular value, only a very small one. This is the practical bridge between
           the clean textbook definition of rank and how it's actually computed in every numerical
           library.
@@ -1366,7 +1510,7 @@ export function SingularValueDecomposition() {
           <strong>Beginner:</strong> every matrix — square or not, even if it's rank-deficient — can
           be broken into three simple pieces: a rotation, a stretch along perpendicular axes, and
           another rotation. <strong>Singular Value Decomposition (SVD)</strong> finds exactly those
-          three pieces. It's like eigenvectors (section 1.6) but works for <em>any</em> matrix, not
+          three pieces. It's like eigenvectors (section 1.7) but works for <em>any</em> matrix, not
           just square ones.
         </p>
         <p>
@@ -1398,9 +1542,9 @@ export function SingularValueDecomposition() {
       <Derivation id="derivation" title="Derivation: why SVD always exists">
         <p>
           Start from <code>AᵀA</code> — always defined, for any shape of A. It's symmetric (
-          <code>(AᵀA)ᵀ = AᵀA</code>) and positive semi-definite (section 1.14), since for any x,{" "}
-          <code>xᵀ(AᵀA)x = (Ax)ᵀ(Ax) = ‖Ax‖² ≥ 0</code>. By the spectral theorem (section 1.6's expert
-          note), a symmetric matrix always has a full set of orthonormal eigenvectors{" "}
+          <code>(AᵀA)ᵀ = AᵀA</code>) and positive semi-definite (section 1.15), since for any x,{" "}
+          <code>xᵀ(AᵀA)x = (Ax)ᵀ(Ax) = ‖Ax‖² ≥ 0</code>. By the spectral theorem (section 1.7's
+          expert note), a symmetric matrix always has a full set of orthonormal eigenvectors{" "}
           <code>v₁,…,vₙ</code> with real, non-negative eigenvalues <code>λ₁,…,λₙ</code>.
         </p>
         <p>
@@ -1408,19 +1552,23 @@ export function SingularValueDecomposition() {
           <code>σᵢ &gt; 0</code>, define <code>uᵢ = Avᵢ/σᵢ</code>. Check these uᵢ are themselves
           orthonormal:
         </p>
-        <Formula>{"u_i \\cdot u_j = \\frac{(Av_i)^T(Av_j)}{\\sigma_i\\sigma_j} = \\frac{v_i^T(A^TA)v_j}{\\sigma_i\\sigma_j} = \\frac{\\lambda_j\\,(v_i\\cdot v_j)}{\\sigma_i\\sigma_j}"}</Formula>
+        <Formula>
+          {
+            "u_i \\cdot u_j = \\frac{(Av_i)^T(Av_j)}{\\sigma_i\\sigma_j} = \\frac{v_i^T(A^TA)v_j}{\\sigma_i\\sigma_j} = \\frac{\\lambda_j\\,(v_i\\cdot v_j)}{\\sigma_i\\sigma_j}"
+          }
+        </Formula>
         <p>
           which is 0 for i≠j (eigenvectors of a symmetric matrix are orthogonal) and exactly 1 when
-          i=j (since <code>λᵢ = σᵢ²</code>). With U's columns as these uᵢ, V's columns as the vᵢ, and Σ
-          holding the σᵢ, the construction directly gives <code>A = UΣVᵀ</code> — and since{" "}
-          <code>AᵀA</code> exists and is always diagonalizable for <em>any</em> matrix A of any shape,
-          this construction never fails.
+          i=j (since <code>λᵢ = σᵢ²</code>). With U's columns as these uᵢ, V's columns as the vᵢ,
+          and Σ holding the σᵢ, the construction directly gives <code>A = UΣVᵀ</code> — and since{" "}
+          <code>AᵀA</code> exists and is always diagonalizable for <em>any</em> matrix A of any
+          shape, this construction never fails.
         </p>
         <p className="text-muted-foreground">
           <strong>Where this is used:</strong> this is exactly the computation running inside{" "}
           <code>np.linalg.svd</code> conceptually (real implementations use more numerically stable
           algorithms, but this is the mathematical guarantee behind them) — and it's why SVD, unlike
-          plain eigen-decomposition (section 1.6), never needs to worry about non-square or
+          plain eigen-decomposition (section 1.7), never needs to worry about non-square or
           non-diagonalizable inputs.
         </p>
       </Derivation>
@@ -1473,13 +1621,13 @@ print("Reconstruction error:", np.linalg.norm(A - A_approx))`}
             <strong>Recommender systems</strong> (Netflix-style) factor a giant, sparse user-movie
             matrix via SVD to discover hidden "taste dimensions" (e.g. "prefers action movies")
             without anyone labeling them — at real-world scale, this is done via randomized SVD
-            (section 1.29), not the exact version shown here.
+            (section 1.30), not the exact version shown here.
           </li>
           <li>
             <strong>Image compression</strong> keeps only the top singular values of a pixel matrix
             to reconstruct a close approximation using a fraction of the data. If you want the
             factors themselves to stay non-negative and interpretable rather than allowing negative
-            entries, that's non-negative matrix factorization instead (section 1.30).
+            entries, that's non-negative matrix factorization instead (section 1.31).
           </li>
           <li>
             <strong>Latent Semantic Analysis</strong> in NLP factors word-document matrices the same
@@ -1492,7 +1640,7 @@ print("Reconstruction error:", np.linalg.norm(A - A_approx))`}
           </li>
           <li>
             <strong>Embedding alignment</strong> — the SVD of a cross-covariance matrix also gives
-            the exact, closed-form solution to the orthogonal Procrustes problem (section 1.32) of
+            the exact, closed-form solution to the orthogonal Procrustes problem (section 1.33) of
             rotating one point set onto another.
           </li>
         </ul>
@@ -1531,7 +1679,7 @@ print("Reconstruction error:", np.linalg.norm(A - A_approx))`}
           trustworthy" a computed result really is, and it's computed via SVD in essentially every
           serious linear algebra library. For large random matrices, the statistical distribution of
           singular values follows the Marchenko-Pastur law — the rectangular-matrix cousin of the
-          eigenvalue semicircle law covered in section 1.18.
+          eigenvalue semicircle law covered in section 1.19.
         </p>
       </ExpertNote>
     </>
@@ -1544,11 +1692,11 @@ export function WhyItMatters() {
       <SectionBlock id="plain-english" label="In plain English">
         <p>
           Every dataset is a matrix. Every data point is a vector. Every neural network layer is a
-          matrix multiplication plus a bias vector (1.4). Similarity between two things is a dot
-          product (1.2). Compressing data or finding its most important patterns is
-          eigen-decomposition (1.6) or SVD (1.9). Knowing whether your features carry real,
-          independent information — or just redundant copies of each other — is rank (1.8). Keeping
-          a model from overfitting is norm-based regularization (1.7). If you genuinely understand
+          matrix multiplication plus a bias vector (1.5). Similarity between two things is a dot
+          product (1.3). Compressing data or finding its most important patterns is
+          eigen-decomposition (1.7) or SVD (1.10). Knowing whether your features carry real,
+          independent information — or just redundant copies of each other — is rank (1.9). Keeping
+          a model from overfitting is norm-based regularization (1.8). If you genuinely understand
           vectors, matrices, dot products, eigenvectors, rank, and SVD, you can read almost any ML
           paper's math section without getting lost.
         </p>
@@ -1568,20 +1716,20 @@ export function WhyItMatters() {
         code={`import numpy as np
 
 X = np.random.rand(200, 5)              # 200 samples, 5 features (a matrix)
-x0 = X[0]                                 # one data point (a vector, 1.1)
+x0 = X[0]                                 # one data point (a vector, 1.2)
 
-sim = np.dot(x0, X[1]) / (np.linalg.norm(x0) * np.linalg.norm(X[1]))  # 1.2
+sim = np.dot(x0, X[1]) / (np.linalg.norm(x0) * np.linalg.norm(X[1]))  # 1.3
 
-W = np.random.rand(5, 3)                  # a "layer" (1.3, 1.4)
+W = np.random.rand(5, 3)                  # a "layer" (1.4, 1.5)
 layer_out = X @ W
 
 Xc = X - X.mean(axis=0)                   # center the data
-cov = Xc.T @ Xc / len(X)                   # covariance matrix (1.5)
-eigvals, eigvecs = np.linalg.eig(cov)      # PCA directions (1.6)
+cov = Xc.T @ Xc / len(X)                   # covariance matrix (1.6)
+eigvals, eigvecs = np.linalg.eig(cov)      # PCA directions (1.7)
 
-reg_penalty = np.linalg.norm(W, ord=2)      # weight regularization (1.7)
-rank = np.linalg.matrix_rank(X)             # true information content (1.8)
-U, S, Vt = np.linalg.svd(Xc)                 # PCA, done the stable way (1.9)`}
+reg_penalty = np.linalg.norm(W, ord=2)      # weight regularization (1.8)
+rank = np.linalg.matrix_rank(X)             # true information content (1.9)
+U, S, Vt = np.linalg.svd(Xc)                 # PCA, done the stable way (1.10)`}
       >
         <p>
           Every single line of this snippet is a concept from this chapter, applied to the same
@@ -1589,103 +1737,103 @@ U, S, Vt = np.linalg.svd(Xc)                 # PCA, done the stable way (1.9)`}
           the hood.
         </p>
       </CodeExample>
-      <SectionBlock id="deeper" label="Go deeper in this chapter (1.11–1.34)" tone="accent">
+      <SectionBlock id="deeper" label="Go deeper in this chapter (1.12–1.35)" tone="accent">
         <p>
-          Lessons 1.1–1.10 are the foundation almost every intro course stops at. The rest of this
+          Lessons 1.2–1.11 are the foundation almost every intro course stops at. The rest of this
           chapter covers what's genuinely needed to go from "comfortable" to "expert" — the parts of
           linear algebra that show up in research papers, production ML systems, and technical
           interviews, but rarely in beginner material:
         </p>
         <ul>
           <li>
-            <strong>1.11 Determinants</strong> — the precise, computable meaning of "singular."
+            <strong>1.12 Determinants</strong> — the precise, computable meaning of "singular."
           </li>
           <li>
-            <strong>1.12 LU Decomposition</strong> — how <code>Ax = b</code> is actually solved,
+            <strong>1.13 LU Decomposition</strong> — how <code>Ax = b</code> is actually solved,
             without ever inverting A.
           </li>
           <li>
-            <strong>1.13 QR &amp; Gram-Schmidt</strong> — orthogonalization, and the numerically
+            <strong>1.14 QR &amp; Gram-Schmidt</strong> — orthogonalization, and the numerically
             stable way to do regression.
           </li>
           <li>
-            <strong>1.14 Positive Definite Matrices &amp; Cholesky</strong> — the matrix version of
+            <strong>1.15 Positive Definite Matrices &amp; Cholesky</strong> — the matrix version of
             "positive," and how Gaussians are sampled.
           </li>
           <li>
-            <strong>1.15 Quadratic Forms &amp; Convexity</strong> — why some loss landscapes are
+            <strong>1.16 Quadratic Forms &amp; Convexity</strong> — why some loss landscapes are
             easy and most deep learning isn't.
           </li>
           <li>
-            <strong>1.16 Matrix Calculus</strong> — the chain rule in matrix form, which is exactly
+            <strong>1.17 Matrix Calculus</strong> — the chain rule in matrix form, which is exactly
             what backpropagation is.
           </li>
           <li>
-            <strong>1.17 Einsum &amp; Tensor Contractions</strong> — the real notation behind
+            <strong>1.18 Einsum &amp; Tensor Contractions</strong> — the real notation behind
             attention and convolution.
           </li>
           <li>
-            <strong>1.18 Random Matrix Theory</strong> — why weight initialization is scaled the way
+            <strong>1.19 Random Matrix Theory</strong> — why weight initialization is scaled the way
             it is.
           </li>
           <li>
-            <strong>1.19 Matrix Norms</strong> — Frobenius, spectral, and nuclear norms, and
+            <strong>1.20 Matrix Norms</strong> — Frobenius, spectral, and nuclear norms, and
             spectral normalization.
           </li>
           <li>
-            <strong>1.20 Numerical Stability</strong> — the log-sum-exp trick behind every stable
+            <strong>1.21 Numerical Stability</strong> — the log-sum-exp trick behind every stable
             softmax.
           </li>
           <li>
-            <strong>1.21 Sparse Matrices</strong> — why real-world ML data is almost always mostly
+            <strong>1.22 Sparse Matrices</strong> — why real-world ML data is almost always mostly
             zeros.
           </li>
           <li>
-            <strong>1.22 Trace of a Matrix</strong> — the sum of the diagonal, and its surprising
+            <strong>1.23 Trace of a Matrix</strong> — the sum of the diagonal, and its surprising
             reach.
           </li>
           <li>
-            <strong>1.23 Power Iteration</strong> — the simple algorithm behind PageRank and fast
+            <strong>1.24 Power Iteration</strong> — the simple algorithm behind PageRank and fast
             approximate PCA.
           </li>
           <li>
-            <strong>1.24 Kernel Methods</strong> — separating data no straight line ever could,
+            <strong>1.25 Kernel Methods</strong> — separating data no straight line ever could,
             without an explicit lift.
           </li>
           <li>
-            <strong>1.25 Whitening</strong> — turning correlated, stretched data into an isotropic
+            <strong>1.26 Whitening</strong> — turning correlated, stretched data into an isotropic
             cloud.
           </li>
           <li>
-            <strong>1.26 The Woodbury Identity</strong> — updating an inverse cheaply, the trick
+            <strong>1.27 The Woodbury Identity</strong> — updating an inverse cheaply, the trick
             behind Kalman filters.
           </li>
           <li>
-            <strong>1.27 Perron-Frobenius Theorem</strong> — the guarantee that makes PageRank's
+            <strong>1.28 Perron-Frobenius Theorem</strong> — the guarantee that makes PageRank's
             steady state well-defined.
           </li>
           <li>
-            <strong>1.28 Generalized Eigenvalue Problems</strong> — what LDA and CCA actually solve.
+            <strong>1.29 Generalized Eigenvalue Problems</strong> — what LDA and CCA actually solve.
           </li>
           <li>
-            <strong>1.29 Randomized Linear Algebra</strong> — how PCA/SVD scale to millions of rows.
+            <strong>1.30 Randomized Linear Algebra</strong> — how PCA/SVD scale to millions of rows.
           </li>
           <li>
-            <strong>1.30 Non-negative Matrix Factorization</strong> — SVD's interpretable cousin.
+            <strong>1.31 Non-negative Matrix Factorization</strong> — SVD's interpretable cousin.
           </li>
           <li>
-            <strong>1.31 Hessian-Vector Products</strong> — getting Hv without ever forming H.
+            <strong>1.32 Hessian-Vector Products</strong> — getting Hv without ever forming H.
           </li>
           <li>
-            <strong>1.32 Orthogonal Procrustes</strong> — the exact way to align two shapes or
+            <strong>1.33 Orthogonal Procrustes</strong> — the exact way to align two shapes or
             embedding spaces.
           </li>
           <li>
-            <strong>1.33 Conjugate Gradient</strong> — solving Ax = b at massive scale, beating
+            <strong>1.34 Conjugate Gradient</strong> — solving Ax = b at massive scale, beating
             gradient descent's zig-zag.
           </li>
           <li>
-            <strong>1.34 Triangular Jacobians &amp; Normalizing Flows</strong> — why flow-based
+            <strong>1.35 Triangular Jacobians &amp; Normalizing Flows</strong> — why flow-based
             generative models are built the exact way they are.
           </li>
         </ul>
@@ -1695,16 +1843,16 @@ U, S, Vt = np.linalg.svd(Xc)                 # PCA, done the stable way (1.9)`}
           <li>
             <strong>Calculus</strong> — gradients are vectors of partial derivatives;
             backpropagation is the chain rule applied through a graph of matrix multiplications
-            (1.16 is the bridge into this).
+            (1.17 is the bridge into this).
           </li>
           <li>
             <strong>Probability &amp; statistics</strong> — covariance matrices, the multivariate
             normal distribution, and maximum likelihood estimation all lean directly on this chapter
-            (1.14 is the bridge into this).
+            (1.15 is the bridge into this).
           </li>
           <li>
             <strong>Optimization</strong> — gradient descent, Newton's method, and convexity all
-            reason about functions using the vectors and matrices introduced here (1.15 and 1.16 are
+            reason about functions using the vectors and matrices introduced here (1.16 and 1.17 are
             the bridge into this).
           </li>
         </ul>

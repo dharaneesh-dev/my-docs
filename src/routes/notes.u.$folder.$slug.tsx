@@ -5,6 +5,7 @@ import { TopNav } from "@/components/docs/top-nav";
 import { DocsSidebar } from "@/components/docs/sidebar";
 import { SiteFooter } from "@/components/docs/site-footer";
 import { TableOfContents, type TocItem } from "@/components/docs/toc";
+import { ShareButton } from "@/components/docs/share-button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   getChapter,
@@ -28,20 +29,50 @@ export const Route = createFileRoute("/notes/u/$folder/$slug")({
     return { disabled };
   },
   head: ({ params }) => {
+    const chapter = getChapter(params.folder);
     const lesson = getLesson(params.folder, params.slug);
     const title = lesson ? `${lesson.title} — Knowledge Base` : "Docs";
     const desc = lesson?.description ?? "Documentation — engineering notes by Dharaneesh Boobalan.";
-    const url = `https://docs.dharaneesh.in/notes/u/${params.folder}/${params.slug}`;
+    const url = `https://notes.dharaneeshboobalan.com/notes/u/${params.folder}/${params.slug}`;
+    const image = "https://notes.dharaneeshboobalan.com/favicon.png";
+    const jsonLd = lesson
+      ? {
+          "@context": "https://schema.org",
+          "@type": "LearningResource",
+          name: lesson.title,
+          headline: lesson.title,
+          description: desc,
+          url,
+          learningResourceType: "Lesson",
+          position: lesson.number,
+          isPartOf: chapter
+            ? { "@type": "Course", name: chapter.label, description: chapter.description }
+            : undefined,
+          author: { "@type": "Person", name: "Dharaneesh Boobalan" },
+          publisher: { "@type": "Person", name: "Dharaneesh Boobalan" },
+        }
+      : null;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
+        {
+          name: "keywords",
+          content: `${lesson?.title ?? ""}, ${chapter?.label ?? ""}, linear algebra, machine learning`,
+        },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
+        { property: "og:image", content: image },
+        { property: "article:section", content: chapter?.label },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: image },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: jsonLd ? [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }] : [],
     };
   },
   notFoundComponent: () => (
@@ -194,15 +225,24 @@ function DocPage() {
               <span className="truncate text-foreground">{lesson.title}</span>
             </nav>
 
-            <header className="mb-6 border-b border-border pb-5">
-              <div className="text-[12px] font-medium uppercase tracking-wider text-primary">
-                {chapter.label} · {lesson.number}
+            <header className="mb-6 flex items-start justify-between gap-4 border-b border-border pb-5">
+              <div className="min-w-0">
+                <div className="text-[12px] font-medium uppercase tracking-wider text-primary">
+                  {chapter.label} · {lesson.number}
+                </div>
+                <h1 className="mt-1 font-display text-[26px] font-normal leading-tight tracking-tight text-foreground sm:text-[28px]">
+                  {lesson.title}
+                </h1>
+                {lesson.description && (
+                  <p className="mt-2 text-[14px] text-muted-foreground">{lesson.description}</p>
+                )}
               </div>
-              <h1 className="mt-1 font-display text-[26px] font-normal leading-tight tracking-tight text-foreground sm:text-[28px]">
-                {lesson.title}
-              </h1>
-              {lesson.description && (
-                <p className="mt-2 text-[14px] text-muted-foreground">{lesson.description}</p>
+              {!disabled && (
+                <ShareButton
+                  title={`${lesson.title} — Knowledge Base`}
+                  text={lesson.description}
+                  url={`https://notes.dharaneeshboobalan.com/notes/u/${chapter.id}/${lesson.slug}`}
+                />
               )}
             </header>
 

@@ -22,7 +22,7 @@ export function GeneralizedEigenvalues() {
     <>
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
-          <strong>Beginner:</strong> section 1.6's eigenvalue problem, <code>Av = λv</code>, asks
+          <strong>Beginner:</strong> section 1.7's eigenvalue problem, <code>Av = λv</code>, asks
           "which directions does A only stretch, never rotate?" The{" "}
           <strong>generalized eigenvalue problem</strong>, <code>Av = λBv</code>, asks a related but
           different question: "which directions does A stretch by exactly λ times as much as B
@@ -50,7 +50,7 @@ export function GeneralizedEigenvalues() {
         <Formula>{"Av = \\lambda Bv"}</Formula>
         <p className="mt-1.5 text-[13.5px] text-muted-foreground">
           When B is the identity matrix, this is exactly the ordinary eigenvalue problem from
-          section 1.6 — the generalized version is a strict superset, not a different topic.
+          section 1.7 — the generalized version is a strict superset, not a different topic.
         </p>
       </SectionBlock>
       <Derivation
@@ -59,7 +59,7 @@ export function GeneralizedEigenvalues() {
       >
         <p>
           When B is symmetric positive definite (the usual ML case), Cholesky-factor it (section
-          1.14) as <code>B = LLᵀ</code>. Substitute into the generalized problem and insert{" "}
+          1.15) as <code>B = LLᵀ</code>. Substitute into the generalized problem and insert{" "}
           <code>L⁻ᵀLᵀ = I</code> in a useful spot:
         </p>
         <Formula>
@@ -71,7 +71,7 @@ export function GeneralizedEigenvalues() {
         </p>
         <Formula>{"L^{-1}A L^{-T} y = \\lambda y"}</Formula>
         <p>
-          This is now an <em>ordinary</em> eigenvalue problem (section 1.6) for the matrix{" "}
+          This is now an <em>ordinary</em> eigenvalue problem (section 1.7) for the matrix{" "}
           <code>C = L⁻¹AL⁻ᵀ</code>, with the exact same eigenvalues <code>λ</code> as the original
           generalized problem — and if A is symmetric, C is symmetric too, so a standard symmetric
           eigensolver applies directly. The original eigenvectors are recovered via{" "}
@@ -118,7 +118,7 @@ print(best_direction)`}
         <ul>
           <li>
             <strong>LDA</strong> is used both as a classifier and as a supervised dimensionality
-            reduction technique — unlike PCA (section 1.6/1.9), it uses class labels to choose
+            reduction technique — unlike PCA (section 1.7/1.10), it uses class labels to choose
             directions that separate categories, not just directions of maximum variance.
           </li>
           <li>
@@ -127,7 +127,7 @@ print(best_direction)`}
             correlated projections of each.
           </li>
           <li>
-            Vibration/structural analysis (the mechanical engineering example from section 1.6) is
+            Vibration/structural analysis (the mechanical engineering example from section 1.7) is
             actually a generalized eigenvalue problem in its full form, <code>Kv = λMv</code>,
             relating stiffness (K) and mass (M) matrices.
           </li>
@@ -142,7 +142,7 @@ print(best_direction)`}
           </li>
           <li>
             Forgetting that a generalized eigenvalue problem needs B to be invertible (or at least
-            positive definite, section 1.14, for the well-behaved real-eigenvalue case) — an
+            positive definite, section 1.15, for the well-behaved real-eigenvalue case) — an
             ill-conditioned within-class scatter matrix is a common practical failure mode of LDA on
             small or collinear datasets.
           </li>
@@ -151,16 +151,16 @@ print(best_direction)`}
       <ExpertNote>
         <p>
           When B is symmetric positive definite (the common case in ML — scatter and covariance
-          matrices are always PSD, section 1.14), the generalized eigenvalue problem has an elegant
+          matrices are always PSD, section 1.15), the generalized eigenvalue problem has an elegant
           reduction: Cholesky-factor <code>B = LLᵀ</code>, then solve the <em>ordinary</em>{" "}
           eigenvalue problem for <code>L⁻¹A(L⁻¹)ᵀ</code> — which is exactly what production-grade
-          generalized eigensolvers do internally, tying this lesson directly back to section 1.14.
+          generalized eigensolvers do internally, tying this lesson directly back to section 1.15.
         </p>
         <p>
           At the master level: LDA assumes each class's within-class scatter is well-estimated,
           which fails badly in high dimensions with few samples per class — regularized/shrinkage
           LDA adds a small multiple of the identity to the within-class scatter matrix before
-          solving, the exact same "ridge" trick from section 1.8 applied here to keep B safely
+          solving, the exact same "ridge" trick from section 1.9 applied here to keep B safely
           invertible.
         </p>
       </ExpertNote>
@@ -173,7 +173,7 @@ export function RandomizedLinearAlgebra() {
     <>
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
-          <strong>Beginner:</strong> exact SVD (section 1.9) of a huge matrix — millions of rows or
+          <strong>Beginner:</strong> exact SVD (section 1.10) of a huge matrix — millions of rows or
           columns — can simply be too slow to compute, even though you usually only care about the
           top few singular values and vectors anyway.{" "}
           <strong>Randomized numerical linear algebra</strong> trades a small, controllable amount
@@ -203,7 +203,7 @@ export function RandomizedLinearAlgebra() {
         </Formula>
         <p className="mt-1.5 text-[13.5px] text-muted-foreground">
           A is projected through a random matrix Ω into a much smaller matrix Y — an orthonormal
-          basis (via QR, section 1.13) for Y's columns then captures most of A's dominant structure,
+          basis (via QR, section 1.14) for Y's columns then captures most of A's dominant structure,
           at a fraction of the cost of factoring A directly.
         </p>
       </SectionBlock>
@@ -263,7 +263,7 @@ def randomized_svd(A, k, oversample=10):
     n = A.shape[1]
     omega = np.random.randn(n, k + oversample)
     Y = A @ omega
-    Q, _ = np.linalg.qr(Y)              # section 1.13
+    Q, _ = np.linalg.qr(Y)              # section 1.14
     B = Q.T @ A
     Ub, Sb, Vtb = np.linalg.svd(B, full_matrices=False)
     return Q @ Ub[:, :k], Sb[:k], Vtb[:k, :]
@@ -294,7 +294,7 @@ print("top singular values close?", np.allclose(S[:10], Sk, atol=1e-1))`}
           </li>
           <li>
             <strong>Large-scale recommender systems</strong> factor enormous, sparse user-item
-            matrices (section 1.21) using randomized or streaming SVD variants — an exact SVD would
+            matrices (section 1.22) using randomized or streaming SVD variants — an exact SVD would
             be computationally infeasible at that scale.
           </li>
           <li>
@@ -342,9 +342,9 @@ export function NonNegativeMatrixFactorization() {
     <>
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
-          <strong>Beginner:</strong> SVD (section 1.9) factors a matrix into pieces that can contain
-          negative numbers, which often makes the individual factors hard to interpret — a "negative
-          amount of a topic" doesn't mean anything intuitive.{" "}
+          <strong>Beginner:</strong> SVD (section 1.10) factors a matrix into pieces that can
+          contain negative numbers, which often makes the individual factors hard to interpret — a
+          "negative amount of a topic" doesn't mean anything intuitive.{" "}
           <strong>Non-negative Matrix Factorization (NMF)</strong> factors a non-negative matrix
           into two smaller non-negative matrices instead, so every piece stays interpretable as "an
           amount of something."
@@ -359,7 +359,7 @@ export function NonNegativeMatrixFactorization() {
         <p>
           <strong>Advanced:</strong> unlike SVD, NMF has no closed-form solution — it's solved
           iteratively (typically via multiplicative update rules or alternating least squares), the
-          factorization isn't unique, and the optimization problem is non-convex (section 1.15), so
+          factorization isn't unique, and the optimization problem is non-convex (section 1.16), so
           different runs (or different random initializations) can converge to different, equally
           valid answers.
         </p>
@@ -377,7 +377,7 @@ export function NonNegativeMatrixFactorization() {
         title="Derivation: why the multiplicative update rule preserves non-negativity"
       >
         <p>
-          Minimizing <code>‖A − WH‖²_F</code> by ordinary gradient descent (section 1.16) on W would
+          Minimizing <code>‖A − WH‖²_F</code> by ordinary gradient descent (section 1.17) on W would
           use <code>W ← W − η·∇_W</code>, where the gradient is <code>∇_W = 2(WH − A)Hᵀ</code>.
           Nothing in that update prevents entries of W from going negative — a generic step size can
           easily overshoot past zero.
@@ -388,13 +388,14 @@ export function NonNegativeMatrixFactorization() {
           into its two non-negative pieces, <code>∇_W = 2(WHHᵀ) − 2(AHᵀ)</code>, and set the
           per-entry step size to{" "}
           <code>
-            η_{"{ij}"} = W_{"{ij}"} / (WHH^T)_{"{ij}"}
-          </code>
-          :
+            η_{"{ij}"} = W_{"{ij}"} / (2(WHH^T)_{"{ij}"})
+          </code>{" "}
+          — half the reciprocal of the positive piece of the gradient, so that piece exactly
+          cancels:
         </p>
         <Formula>
           {
-            "W_{ij} \\leftarrow W_{ij} - \\frac{W_{ij}}{(WHH^T)_{ij}}\\Big(2(WHH^T)_{ij} - 2(AH^T)_{ij}\\Big) = W_{ij}\\frac{(AH^T)_{ij}}{(WHH^T)_{ij}}"
+            "W_{ij} \\leftarrow W_{ij} - \\frac{W_{ij}}{2(WHH^T)_{ij}}\\Big(2(WHH^T)_{ij} - 2(AH^T)_{ij}\\Big) = W_{ij}\\frac{(AH^T)_{ij}}{(WHH^T)_{ij}}"
           }
         </Formula>
         <p>
@@ -450,7 +451,7 @@ print(W.round(2))   # each row sums up "how much of each topic" per document`}
       >
         <p>
           <code>init='nndsvd'</code> uses a non-negative-adapted SVD to pick a good starting point —
-          a direct, practical bridge between sections 1.9 and this one.
+          a direct, practical bridge between sections 1.10 and this one.
         </p>
       </CodeExample>
       <SectionBlock id="example" label="Real-world examples" tone="good">
@@ -509,7 +510,7 @@ export function HessianVectorProducts() {
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
           <strong>The one-sentence idea:</strong> you almost never actually need the full Hessian
-          matrix (section 1.15) itself — you usually only need to know what it <em>does</em> to a
+          matrix (section 1.16) itself — you usually only need to know what it <em>does</em> to a
           specific vector, and there's a way to get that answer directly, without ever building the
           (potentially enormous) matrix in between.
         </p>
@@ -523,7 +524,7 @@ export function HessianVectorProducts() {
           <strong>Intermediate:</strong> the <strong>Pearlmutter trick</strong> (also called the
           "R-op") computes exactly this Hessian-vector product using two ordinary backward passes
           (or a forward and backward pass), reusing the same automatic differentiation machinery
-          from section 1.16 — at a cost comparable to just a couple of regular gradient
+          from section 1.17 — at a cost comparable to just a couple of regular gradient
           computations, regardless of how many parameters the model has.
         </p>
         <p>
@@ -619,11 +620,11 @@ print(hvp)   # tensor([2., 4.]) -- matches the hand-derivation above`}
             <strong>Influence functions</strong> (estimating how much a single training example
             affected a trained model's predictions) rely on efficiently solving linear systems
             involving the Hessian, which is only tractable via Hessian-vector products plus an
-            iterative solver like conjugate gradient (section 1.33).
+            iterative solver like conjugate gradient (section 1.34).
           </li>
           <li>
             <strong>Sharpness-aware training methods</strong> use the largest eigenvalue of the
-            Hessian (estimated via power iteration, section 1.23, using nothing but repeated
+            Hessian (estimated via power iteration, section 1.24, using nothing but repeated
             Hessian-vector products) as a proxy for how "flat" or "sharp" a solution is.
           </li>
         </ul>
@@ -646,12 +647,12 @@ print(hvp)   # tensor([2., 4.]) -- matches the hand-derivation above`}
         <p>
           The same trick generalizes to Jacobian-vector products for any vector-valued function, not
           just gradients of scalar losses — this is exactly what "forward-mode automatic
-          differentiation" (mentioned in section 1.16's expert note) computes directly and
+          differentiation" (mentioned in section 1.17's expert note) computes directly and
           efficiently.
         </p>
         <p>
           At the master level: combining Hessian-vector products with the power iteration algorithm
-          of section 1.23 (using Hv repeatedly instead of a fixed matrix multiply) is precisely how
+          of section 1.24 (using Hv repeatedly instead of a fixed matrix multiply) is precisely how
           practitioners estimate a neural network loss landscape's sharpest curvature directions
           without ever materializing a Hessian that would otherwise be far too large to store.
         </p>
@@ -673,9 +674,9 @@ export function OrthogonalProcrustes() {
         </p>
         <p>
           <strong>Intermediate:</strong> remarkably, this has an exact, closed-form answer, and it
-          comes directly from the SVD (section 1.9): compute the cross-covariance matrix between the
-          two point sets, take its SVD <code>UΣVᵀ</code>, and the optimal rotation is simply{" "}
-          <code>R = VUᵀ</code> — no iterative optimization needed at all.
+          comes directly from the SVD (section 1.10): compute the cross-covariance matrix between
+          the two point sets, take its SVD <code>UΣVᵀ</code>, and the optimal rotation is simply{" "}
+          <code>R = UVᵀ</code> — no iterative optimization needed at all.
         </p>
         <p>
           <strong>Advanced:</strong> this is the standard tool for{" "}
@@ -687,15 +688,15 @@ export function OrthogonalProcrustes() {
       <SectionBlock id="formula" label="Formula" tone="formula">
         <Formula>
           {
-            "R^* = \\arg\\min_{R^TR=I} \\|A R - B\\|_F \\quad\\Longrightarrow\\quad R^* = VU^T \\text{ where } A^TB = U\\Sigma V^T"
+            "R^* = \\arg\\min_{R^TR=I} \\|A R - B\\|_F \\quad\\Longrightarrow\\quad R^* = UV^T \\text{ where } A^TB = U\\Sigma V^T"
           }
         </Formula>
       </SectionBlock>
-      <Derivation id="derivation" title="Derivation: why R* = VUᵀ solves the Procrustes problem">
+      <Derivation id="derivation" title="Derivation: why R* = UVᵀ solves the Procrustes problem">
         <p>
           Minimizing <code>‖AR − B‖²_F</code> over rotations R is equivalent to maximizing a simpler
           quantity. Expand the squared Frobenius norm using <code>‖X‖²_F = trace(XᵀX)</code>{" "}
-          (section 1.19):
+          (section 1.20):
         </p>
         <Formula>
           {
@@ -703,7 +704,7 @@ export function OrthogonalProcrustes() {
           }
         </Formula>
         <p>
-          The first term equals <code>trace(AᵀA)</code> by the cyclic property (section 1.22) since{" "}
+          The first term equals <code>trace(AᵀA)</code> by the cyclic property (section 1.23) since{" "}
           <code>RᵀR = I</code>, and the last term doesn't involve R at all — so minimizing the whole
           expression over R is exactly equivalent to <em>maximizing</em>{" "}
           <code>trace(RᵀAᵀB) = trace(RᵀM)</code> where <code>M = AᵀB = UΣVᵀ</code>. Substitute the
@@ -718,10 +719,12 @@ export function OrthogonalProcrustes() {
           Z is a product of orthogonal matrices, so it's orthogonal too, meaning every entry of Z
           satisfies <code>|Z_{"{ii}"}| ≤ 1</code>. Since Σ has non-negative diagonal entries,{" "}
           <code>trace(ZΣ) = Σᵢ Z_{"{ii}"}σᵢ</code> is maximized exactly when every{" "}
-          <code>Z_{"{ii}"} = 1</code>, i.e. when <code>Z = I</code>. Solving <code>VᵀRᵀU = I</code>{" "}
-          for R gives <code>R = VUᵀ</code> — the closed form, derived entirely from properties of
-          trace and orthogonal matrices already covered in this chapter, with no iterative search
-          required.
+          <code>Z_{"{ii}"} = 1</code>, i.e. when <code>Z = I</code>. Solve <code>VᵀRᵀU = I</code>{" "}
+          for R: left-multiply by V to get <code>RᵀU = V</code> (using <code>VVᵀ = I</code>), then
+          right-multiply by <code>Uᵀ</code> to get <code>Rᵀ = VUᵀ</code> (using <code>UUᵀ = I</code>
+          ). Transposing both sides gives <code>R = UVᵀ</code> — the closed form, derived entirely
+          from properties of trace and orthogonal matrices already covered in this chapter, with no
+          iterative search required.
         </p>
         <p className="mt-2 text-[13px] text-muted-foreground">
           Where this is used: every cross-lingual embedding alignment pipeline and
@@ -787,16 +790,18 @@ print(np.allclose(aligned, target, atol=1e-6))   # True -- perfect recovery`}
             known correspondence, it does not discover the correspondence itself.
           </li>
           <li>
-            Using <code>R = UVᵀ</code> instead of <code>R = VUᵀ</code> (or vice versa) — the exact
-            formula depends on whether you defined the cross-covariance as <code>AᵀB</code> or{" "}
-            <code>BᵀA</code>; always double-check against a known test case.
+            Swapping the order to <code>R = VUᵀ</code> — the correct formula depends on which matrix
+            the cross-covariance is built from; with <code>M = AᵀB = UΣVᵀ</code> as defined above
+            the answer is <code>R = UVᵀ</code>, not <code>VUᵀ</code> (defining the cross-covariance
+            the other way round, <code>BᵀA</code>, would swap U and V and flip which order is
+            correct) — always double-check against a known test case.
           </li>
         </ul>
       </Pitfall>
       <ExpertNote>
         <p>
           A subtlety: the raw SVD solution can produce a <em>reflection</em> rather than a pure
-          rotation if the determinant of <code>VUᵀ</code> comes out negative — the standard fix
+          rotation if the determinant of <code>UVᵀ</code> comes out negative — the standard fix
           flips the sign of the last column of V (or the corresponding singular value) to force a
           proper rotation when one is specifically required.
         </p>
@@ -817,12 +822,12 @@ export function ConjugateGradientMethod() {
     <>
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
-          <strong>Beginner:</strong> section 1.16's gradient descent diagram showed a real weakness:
+          <strong>Beginner:</strong> section 1.17's gradient descent diagram showed a real weakness:
           on a stretched, poorly-conditioned bowl, it zig-zags back and forth instead of heading
           straight for the minimum, needing many small steps. The{" "}
           <strong>conjugate gradient (CG) method</strong> is a smarter iterative algorithm for
           exactly this kind of problem — solving <code>Ax = b</code> (equivalently, minimizing a
-          quadratic form, section 1.15) — that avoids this zig-zagging almost entirely.
+          quadratic form, section 1.16) — that avoids this zig-zagging almost entirely.
         </p>
         <p>
           <strong>Intermediate:</strong> the key idea is choosing each step direction to be{" "}
@@ -835,7 +840,7 @@ export function ConjugateGradientMethod() {
           <strong>Advanced:</strong> for a quadratic problem in n dimensions, this guarantee is
           exact and remarkable: conjugate gradient reaches the true minimum in at most n steps, in
           exact arithmetic — regardless of how poorly conditioned the problem is. In practice, on
-          large, sparse, symmetric positive-definite systems (section 1.14), CG is run for far fewer
+          large, sparse, symmetric positive-definite systems (section 1.15), CG is run for far fewer
           than n iterations and still gets an excellent approximate answer, which is exactly why
           it's the standard method for enormous linear systems where forming or inverting the full
           matrix is completely infeasible.
@@ -857,7 +862,7 @@ export function ConjugateGradientMethod() {
       >
         <p>
           Solving <code>Ax = b</code> for symmetric positive-definite A is equivalent to minimizing
-          the quadratic form <code>φ(x) = ½xᵀAx − bᵀx</code> (section 1.15), since its gradient{" "}
+          the quadratic form <code>φ(x) = ½xᵀAx − bᵀx</code> (section 1.16), since its gradient{" "}
           <code>∇φ(x) = Ax − b</code> is exactly the residual, zero precisely at the solution. Given
           a current point <code>xₖ</code> and search direction <code>dₖ</code>, an exact line search
           picks the step size <code>αₖ</code> that minimizes <code>φ(xₖ + αdₖ)</code> along that one
@@ -919,7 +924,7 @@ def conjugate_gradient(A, b, x0, tol=1e-8, max_iter=None):
 
 n = 200
 Q = np.random.randn(n, n)
-A = Q.T @ Q + n * np.eye(n)   # a large, well-behaved symmetric PD system (section 1.14)
+A = Q.T @ Q + n * np.eye(n)   # a large, well-behaved symmetric PD system (section 1.15)
 b = np.random.randn(n)
 
 x = conjugate_gradient(A, b, np.zeros(n))
@@ -927,7 +932,7 @@ print(np.allclose(A @ x, b, atol=1e-4))   # True, without ever forming A^-1`}
       >
         <p>
           This is a genuine, working large-scale linear solver in about a dozen lines — the same
-          algorithm scales to systems with millions of variables when A is sparse (section 1.21).
+          algorithm scales to systems with millions of variables when A is sparse (section 1.22).
         </p>
       </CodeExample>
       <SectionBlock id="example" label="Real-world examples" tone="good">
@@ -935,13 +940,13 @@ print(np.allclose(A @ x, b, atol=1e-4))   # True, without ever forming A^-1`}
           <li>
             <strong>Natural gradient descent</strong> and other second-order optimization methods
             use CG to approximately solve the linear system involving the Fisher information matrix
-            or Hessian (section 1.15), combined with Hessian-vector products (section 1.31) to avoid
+            or Hessian (section 1.16), combined with Hessian-vector products (section 1.32) to avoid
             ever forming that matrix explicitly.
           </li>
           <li>
             <strong>Approximate Gaussian process inference</strong> uses CG to solve the large
-            linear systems involving the kernel matrix (section 1.24) that exact Cholesky-based
-            inference (section 1.14) would find too expensive at scale.
+            linear systems involving the kernel matrix (section 1.25) that exact Cholesky-based
+            inference (section 1.15) would find too expensive at scale.
           </li>
           <li>
             <strong>Physics simulation and finite-element analysis</strong> rely on CG (and its
@@ -977,7 +982,7 @@ print(np.allclose(A @ x, b, atol=1e-4))   # True, without ever forming A^-1`}
           At the master level: <strong>preconditioned conjugate gradient (PCG)</strong> transforms
           the system into an equivalent one with a much better condition number before running CG,
           typically using an approximate, cheap-to-invert version of A (like its diagonal, or an
-          incomplete Cholesky factorization, section 1.14) — this is what makes CG practical on the
+          incomplete Cholesky factorization, section 1.15) — this is what makes CG practical on the
           genuinely huge, ill-conditioned systems that appear in real scientific computing and
           large-scale ML.
         </p>
@@ -995,7 +1000,7 @@ export function TriangularJacobiansFlows() {
     <>
       <SectionBlock id="plain-english" label="In plain English — beginner to advanced">
         <p>
-          <strong>Beginner:</strong> section 1.11 mentioned that transforming a probability
+          <strong>Beginner:</strong> section 1.12 mentioned that transforming a probability
           distribution into new coordinates requires dividing by the absolute value of a Jacobian
           determinant, to keep total probability equal to 1. <strong>Normalizing flows</strong>, a
           family of generative models, are built entirely around this one fact — they model a
@@ -1003,10 +1008,10 @@ export function TriangularJacobiansFlows() {
           noise, tracking exactly how probability density changes at every step.
         </p>
         <p>
-          <strong>Intermediate:</strong> the catch is that computing a determinant (section 1.11) is
+          <strong>Intermediate:</strong> the catch is that computing a determinant (section 1.12) is
           normally expensive — <code>O(n³)</code> in general. Normalizing flows sidestep this
           entirely by deliberately designing every transformation so its Jacobian matrix is exactly{" "}
-          <strong>triangular</strong> — and the determinant of a triangular matrix (section 1.12) is
+          <strong>triangular</strong> — and the determinant of a triangular matrix (section 1.13) is
           just the product of its diagonal, computable in <code>O(n)</code> time instead.
         </p>
         <p>
@@ -1026,7 +1031,7 @@ export function TriangularJacobiansFlows() {
         <p className="mt-1.5 text-[13.5px] text-muted-foreground">
           The change-of-variables formula from probability, combined with the triangular-Jacobian
           trick — the product on the right is over just the diagonal entries, exactly as in section
-          1.12's observation about triangular matrices.
+          1.13's observation about triangular matrices.
         </p>
       </SectionBlock>
       <Derivation
@@ -1037,7 +1042,7 @@ export function TriangularJacobiansFlows() {
           Let <code>z = f(x)</code> be an invertible, differentiable transformation, with{" "}
           <code>z</code> distributed according to a known simple density <code>p_Z</code>. For any
           small region <code>dx</code> around a point x, the transformed region has volume{" "}
-          <code>|det J_f(x)|·dx</code> (section 1.11's geometric meaning of the determinant — it's
+          <code>|det J_f(x)|·dx</code> (section 1.12's geometric meaning of the determinant — it's
           exactly the local volume-scaling factor of the map). Conservation of total probability
           requires the probability mass in the two corresponding regions to match exactly:
         </p>
@@ -1142,9 +1147,9 @@ print(log_det)   # the ENTIRE Jacobian determinant computation, no matrix needed
         <p>
           At the master level: continuous normalizing flows (built on Neural ODEs) replace this
           discrete stack of triangular-Jacobian layers with a continuous-time transformation whose
-          log-determinant is instead computed via the <strong>trace</strong> (section 1.22) of the
+          log-determinant is instead computed via the <strong>trace</strong> (section 1.23) of the
           instantaneous Jacobian, integrated over time — the "instantaneous change of variables"
-          formula — connecting this entire lesson back to trace, matrix calculus (section 1.16), and
+          formula — connecting this entire lesson back to trace, matrix calculus (section 1.17), and
           differential equations in one further generalization.
         </p>
       </ExpertNote>

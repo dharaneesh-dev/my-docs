@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
         content:
           "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science.",
       },
-      { property: "og:url", content: "https://docs.dharaneesh.in/" },
+      { property: "og:url", content: "https://notes.dharaneeshboobalan.com/" },
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: "Knowledge Base | By Dharaneesh Boobalan" },
       {
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
           "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://docs.dharaneesh.in/" }],
+    links: [{ rel: "canonical", href: "https://notes.dharaneeshboobalan.com/" }],
   }),
   component: Home,
 });
