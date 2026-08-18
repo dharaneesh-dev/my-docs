@@ -4,8 +4,7 @@ import { ChevronRight, Menu } from "lucide-react";
 import { TopNav } from "@/components/docs/top-nav";
 import { DocsSidebar } from "@/components/docs/sidebar";
 import { SiteFooter } from "@/components/docs/site-footer";
-// Right-hand "On this page" TOC disabled per request — kept for easy re-enable.
-// import { TableOfContents, type TocItem } from "@/components/docs/toc";
+import { TableOfContents, type TocItem } from "@/components/docs/toc";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   getChapter,
@@ -73,7 +72,7 @@ function DocPage() {
   const { chapter, lesson, prev, next, disabled } = Route.useLoaderData();
   const [open, setOpen] = useState(false);
   const [sidebarW, setSidebarW] = useState(SIDEBAR_DEFAULT);
-  // const [toc, setToc] = useState<TocItem[]>([]);
+  const [toc, setToc] = useState<TocItem[]>([]);
   const dragging = useRef(false);
   const articleRef = useRef<HTMLDivElement>(null);
   const LessonComponent = lesson.Component;
@@ -111,15 +110,14 @@ function DocPage() {
     };
   }, [sidebarW]);
 
-  // Right-hand TOC disabled — see import comment above.
-  // useEffect(() => {
-  //   const nodes = articleRef.current?.querySelectorAll<HTMLElement>("[data-toc-label]");
-  //   setToc(
-  //     Array.from(nodes ?? [])
-  //       .filter((n) => n.id)
-  //       .map((n) => ({ id: n.id, text: n.dataset.tocLabel ?? n.id })),
-  //   );
-  // }, [lesson.slug]);
+  useEffect(() => {
+    const nodes = articleRef.current?.querySelectorAll<HTMLElement>("[data-toc-label]");
+    setToc(
+      Array.from(nodes ?? [])
+        .filter((n) => n.id)
+        .map((n) => ({ id: n.id, text: n.dataset.tocLabel ?? n.id })),
+    );
+  }, [lesson.slug]);
 
   const startDrag = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -149,7 +147,7 @@ function DocPage() {
       />
 
       <div
-        className="grid w-full grid-cols-1 gap-0 lg:grid-cols-[var(--sb)_4px_minmax(0,1fr)]"
+        className="grid w-full grid-cols-1 gap-0 lg:grid-cols-[var(--sb)_4px_minmax(0,1fr)_240px]"
         style={{ ["--sb" as string]: `${sidebarW}px` }}
       >
         <aside className="hidden border-r border-border bg-sidebar lg:block">
@@ -201,7 +199,6 @@ function DocPage() {
               )}
             </header>
 
-            {/* "On this page" mobile TOC disabled per request — kept for easy re-enable.
             <details className="mb-6 rounded-md border border-border bg-card/40 px-3 py-2 text-[13px] lg:hidden">
               <summary className="cursor-pointer select-none text-muted-foreground">
                 On this page
@@ -210,7 +207,6 @@ function DocPage() {
                 <TableOfContents items={toc} />
               </div>
             </details>
-            */}
 
             {disabled ? (
               <div className="max-w-[760px] rounded-lg border border-destructive/40 bg-destructive/5 p-6">
@@ -263,13 +259,11 @@ function DocPage() {
           </div>
         </article>
 
-        {/* Right-hand "On this page" TOC sidebar disabled per request — kept for easy re-enable.
         <aside className="hidden lg:block">
           <div className="sticky top-14 max-h-[calc(100vh-3.5rem)] overflow-y-auto px-5 py-10">
             <TableOfContents items={toc} />
           </div>
         </aside>
-        */}
       </div>
       <SiteFooter />
     </div>
