@@ -1,39 +1,44 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { TopNav } from "@/components/docs/top-nav";
 import { SiteFooter } from "@/components/docs/site-footer";
-import { Loader } from "@/components/docs/loader";
-import { manifestQueryOptions } from "@/lib/docs-remote";
+import { AIBrainLogo } from "@/components/docs/ai-brain-logo";
+import { enabledChapters, enabledLessons } from "@/content/registry";
 import * as Icons from "lucide-react";
 import { ArrowRight } from "lucide-react";
-import { AIBrainLogo } from "@/components/docs/ai-brain-logo";
-
-
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Knowledge Base | By Dharaneesh Boobalan" },
-      { name: "description", content: "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science — by Dharaneesh Boobalan." },
+      {
+        name: "description",
+        content:
+          "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science — by Dharaneesh Boobalan.",
+      },
       { property: "og:title", content: "Knowledge Base | By Dharaneesh Boobalan" },
-      { property: "og:description", content: "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science." },
+      {
+        property: "og:description",
+        content:
+          "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science.",
+      },
       { property: "og:url", content: "https://docs.dharaneesh.in/" },
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: "Knowledge Base | By Dharaneesh Boobalan" },
-      { name: "twitter:description", content: "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science." },
+      {
+        name: "twitter:description",
+        content:
+          "Engineering knowledge base spanning ML, inference, agentic AI, systems, and rocket science.",
+      },
     ],
     links: [{ rel: "canonical", href: "https://docs.dharaneesh.in/" }],
   }),
-  loader: ({ context }) => {
-    context.queryClient.prefetchQuery(manifestQueryOptions);
-  },
   component: Home,
 });
 
 function Home() {
-  const { data, isLoading, error } = useQuery(manifestQueryOptions);
-  // Use the first configDoc's first child for the "Start reading" button
-  const firstConfigDoc = data?.configDocs[0];
+  const chapters = enabledChapters();
+  const firstChapter = chapters[0];
+  const firstLesson = firstChapter && enabledLessons(firstChapter)[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,7 +48,8 @@ function Home() {
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_auto]">
             <div className="min-w-0">
               <p className="mb-4 text-[12px] font-medium uppercase tracking-wider text-primary">
-                Documentation <span className="text-muted-foreground">/ by Dharaneesh Boobalan</span>
+                Documentation{" "}
+                <span className="text-muted-foreground">/ by Dharaneesh Boobalan</span>
               </p>
               <h1 className="font-display text-[32px] font-normal leading-tight tracking-tight text-foreground sm:text-[42px] lg:text-[48px]">
                 Engineering knowledge base
@@ -59,10 +65,10 @@ function Home() {
               </figure>
 
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                {firstConfigDoc && firstConfigDoc.firstSlug && (
+                {firstChapter && firstLesson && (
                   <Link
-                    to="/docs/$folder/$slug"
-                    params={{ folder: firstConfigDoc.folder, slug: firstConfigDoc.firstSlug }}
+                    to="/notes/u/$folder/$slug"
+                    params={{ folder: firstChapter.id, slug: firstLesson.slug }}
                     className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition hover:opacity-90"
                   >
                     Start reading <ArrowRight className="h-3.5 w-3.5" />
@@ -87,60 +93,51 @@ function Home() {
           </div>
         </section>
 
-
-
         <section id="sections" className="py-12">
           <h2 className="mb-6 font-display text-[20px] font-normal text-foreground">
             All documentation
           </h2>
 
-          {isLoading && <Loader label="Loading docs" />}
-
-          {error && (
-            <div className="rounded border border-destructive/40 bg-destructive/5 p-4 text-[13px] text-destructive">
-              Couldn't load docs index from GitHub. Check the repo, branch, and config.json.
-            </div>
-          )}
-
-          {data && (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {data.configDocs.map((d) => {
-                const Icon = (Icons as any)[d.icon] ?? Icons.FileText;
-                return (
-                  <Link
-                    key={d.id}
-                    to="/docs/$folder/$slug"
-                    params={{ folder: d.folder, slug: d.firstSlug }}
-                    className="card-hover group flex flex-col gap-3 rounded-lg border border-border bg-card p-5"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="grid h-8 w-8 place-items-center rounded bg-accent text-accent-foreground">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                        {d.folder.replace(/-/g, " ")}
-                      </span>
-                    </div>
-                    <h3 className="font-display text-[16px] font-medium leading-snug text-foreground">
-                      {d.label}
-                    </h3>
-                    {d.description && (
-                      <p className="text-[13px] leading-relaxed text-muted-foreground">
-                        {d.description}
-                      </p>
-                    )}
-                    <div className="mt-auto inline-flex items-center gap-1 text-[13px] text-primary">
-                      Open <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {chapters.map((chapter) => {
+              const Icon =
+                (Icons as unknown as Record<string, typeof Icons.FileText>)[chapter.icon] ??
+                Icons.FileText;
+              const lessons = enabledLessons(chapter);
+              const first = lessons[0];
+              return (
+                <Link
+                  key={chapter.id}
+                  to="/notes/u/$folder/$slug"
+                  params={{ folder: chapter.id, slug: first?.slug ?? "" }}
+                  className="card-hover group flex flex-col gap-3 rounded-lg border border-border bg-card p-5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="grid h-8 w-8 place-items-center rounded bg-accent text-accent-foreground">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                      {lessons.length} lesson{lessons.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  <h3 className="font-display text-[16px] font-medium leading-snug text-foreground">
+                    {chapter.label}
+                  </h3>
+                  {chapter.description && (
+                    <p className="text-[13px] leading-relaxed text-muted-foreground">
+                      {chapter.description}
+                    </p>
+                  )}
+                  <div className="mt-auto inline-flex items-center gap-1 text-[13px] text-primary">
+                    Open <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </section>
       </main>
       <SiteFooter />
-
     </div>
   );
 }

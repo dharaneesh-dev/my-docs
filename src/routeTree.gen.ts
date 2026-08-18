@@ -9,65 +9,58 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DocsFolderSlugRouteImport } from './routes/docs.$folder.$slug'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as NotesUFolderSlugRouteImport } from './routes/notes.u.$folder.$slug'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsFolderSlugRoute = DocsFolderSlugRouteImport.update({
-  id: '/docs/$folder/$slug',
-  path: '/docs/$folder/$slug',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesUFolderSlugRoute = NotesUFolderSlugRouteImport.update({
+  id: '/notes/u/$folder/$slug',
+  path: '/notes/u/$folder/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/docs/$folder/$slug': typeof DocsFolderSlugRoute
+  '/notes/u/$folder/$slug': typeof NotesUFolderSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/docs/$folder/$slug': typeof DocsFolderSlugRoute
+  '/notes/u/$folder/$slug': typeof NotesUFolderSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/docs/$folder/$slug': typeof DocsFolderSlugRoute
+  '/notes/u/$folder/$slug': typeof NotesUFolderSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml' | '/docs/$folder/$slug'
+  fullPaths: '/' | '/sitemap.xml' | '/notes/u/$folder/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml' | '/docs/$folder/$slug'
-  id: '__root__' | '/' | '/sitemap.xml' | '/docs/$folder/$slug'
+  to: '/' | '/sitemap.xml' | '/notes/u/$folder/$slug'
+  id: '__root__' | '/' | '/sitemap.xml' | '/notes/u/$folder/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  DocsFolderSlugRoute: typeof DocsFolderSlugRoute
+  NotesUFolderSlugRoute: typeof NotesUFolderSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -75,11 +68,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs/$folder/$slug': {
-      id: '/docs/$folder/$slug'
-      path: '/docs/$folder/$slug'
-      fullPath: '/docs/$folder/$slug'
-      preLoaderRoute: typeof DocsFolderSlugRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/u/$folder/$slug': {
+      id: '/notes/u/$folder/$slug'
+      path: '/notes/u/$folder/$slug'
+      fullPath: '/notes/u/$folder/$slug'
+      preLoaderRoute: typeof NotesUFolderSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  DocsFolderSlugRoute: DocsFolderSlugRoute,
+  NotesUFolderSlugRoute: NotesUFolderSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

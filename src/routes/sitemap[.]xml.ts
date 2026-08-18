@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { fetchManifest } from "@/lib/docs-remote";
+import { enabledChapters, enabledLessons } from "@/content/registry";
 
 const BASE_URL = "https://docs.dharaneesh.in";
 
@@ -8,13 +8,9 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        let docPaths: string[] = [];
-        try {
-          const m = await fetchManifest();
-          docPaths = m.flat.map((d) => `/docs/${d.folder}/${d.slug}`);
-        } catch {
-          /* GitHub unreachable — emit home only */
-        }
+        const docPaths = enabledChapters().flatMap((chapter) =>
+          enabledLessons(chapter).map((lesson) => `/notes/u/${chapter.id}/${lesson.slug}`),
+        );
         const entries = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           ...docPaths.map((p) => ({ path: p, changefreq: "weekly", priority: "0.8" })),

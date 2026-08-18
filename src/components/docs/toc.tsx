@@ -1,25 +1,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-export type TocItem = { id: string; text: string; level: number };
-
-export function extractToc(markdown: string): TocItem[] {
-  const lines = markdown.split("\n");
-  const out: TocItem[] = [];
-  let inFence = false;
-  for (const line of lines) {
-    if (line.trim().startsWith("```")) { inFence = !inFence; continue; }
-    if (inFence) continue;
-    const m = /^(#{2,3})\s+(.+?)\s*$/.exec(line);
-    if (m) {
-      const level = m[1].length;
-      const text = m[2].replace(/[`*_]/g, "").trim();
-      const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
-      out.push({ id, text, level });
-    }
-  }
-  return out;
-}
+export type TocItem = { id: string; text: string };
 
 export function TableOfContents({ items }: { items: TocItem[] }) {
   const [active, setActive] = useState<string>("");
@@ -33,7 +15,7 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
         if (vis?.target.id) setActive(vis.target.id);
       },
-      { rootMargin: "-80px 0px -70% 0px", threshold: [0, 1] }
+      { rootMargin: "-80px 0px -70% 0px", threshold: [0, 1] },
     );
     items.forEach((i) => {
       const el = document.getElementById(i.id);
@@ -50,14 +32,14 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
       </p>
       <ul className="space-y-2">
         {items.map((it) => (
-          <li key={it.id} style={{ paddingLeft: it.level === 3 ? 14 : 0 }}>
+          <li key={it.id}>
             <a
               href={`#${it.id}`}
               className={cn(
                 "block leading-snug transition-colors",
                 active === it.id
                   ? "font-medium text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {it.text}
