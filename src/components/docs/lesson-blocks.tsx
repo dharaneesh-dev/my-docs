@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { CodeBlock } from "./code-block";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export function SectionBlock({
   id,
@@ -18,7 +19,7 @@ export function SectionBlock({
       id={id}
       data-toc-label={id ? label : undefined}
       className={cn(
-        "prose-docs my-4 max-w-[760px] scroll-mt-20 rounded-lg border p-5",
+        "prose-docs my-4 scroll-mt-20 rounded-lg border p-5",
         tone === "default" && "border-border bg-card",
         tone === "formula" && "border-primary/25 bg-primary/5",
         tone === "good" && "border-emerald-500/30 bg-emerald-500/5",
@@ -36,7 +37,7 @@ export function SectionBlock({
 
 export function ExpertNote({ children }: { children: ReactNode }) {
   return (
-    <details className="my-4 max-w-[760px] rounded-lg border border-amber-500/30 bg-amber-500/5 px-5">
+    <details className="my-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-5">
       <summary className="cursor-pointer list-none py-3 text-[12.5px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
         Going deeper
       </summary>
@@ -47,7 +48,7 @@ export function ExpertNote({ children }: { children: ReactNode }) {
 
 export function Quiz({ q, a }: { q: string; a: string }) {
   return (
-    <div className="my-4 max-w-[760px] rounded-lg border border-border bg-card p-5">
+    <div className="my-4 rounded-lg border border-border bg-card p-5">
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         Check yourself
       </div>
@@ -61,7 +62,7 @@ export function Quiz({ q, a }: { q: string; a: string }) {
 
 export function Pitfall({ children }: { children: ReactNode }) {
   return (
-    <div className="prose-docs my-4 max-w-[760px] rounded-lg border border-red-500/30 bg-red-500/5 p-5">
+    <div className="prose-docs my-4 rounded-lg border border-red-500/30 bg-red-500/5 p-5">
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">
         Common mistakes
       </div>
@@ -87,13 +88,55 @@ export function CodeExample({
     <div
       id={id}
       data-toc-label={id ? title : undefined}
-      className="prose-docs my-4 max-w-[760px] scroll-mt-20 rounded-lg border border-border bg-card p-5"
+      className="prose-docs my-4 scroll-mt-20 rounded-lg border border-border bg-card p-5"
     >
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         {title}
       </div>
       {children}
       <CodeBlock code={code} lang={lang} />
+    </div>
+  );
+}
+
+/** A code block with multiple language/framing tabs — e.g. "Python (from scratch)",
+ *  "C++ (from scratch)", "Python (library)" — for lessons that show the same algorithm
+ *  implemented manually in more than one language plus its real-world library usage. */
+export function MultiCodeExample({
+  id,
+  title,
+  tabs,
+  children,
+}: {
+  id?: string;
+  title: string;
+  tabs: { label: string; lang: string; code: string }[];
+  children?: ReactNode;
+}) {
+  return (
+    <div
+      id={id}
+      data-toc-label={id ? title : undefined}
+      className="prose-docs my-4 scroll-mt-20 rounded-lg border border-border bg-card p-5"
+    >
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {title}
+      </div>
+      {children}
+      <Tabs defaultValue={tabs[0]?.label}>
+        <TabsList>
+          {tabs.map((t) => (
+            <TabsTrigger key={t.label} value={t.label}>
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {tabs.map((t) => (
+          <TabsContent key={t.label} value={t.label}>
+            <CodeBlock code={t.code} lang={t.lang} />
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }
@@ -111,7 +154,7 @@ export function Derivation({
     <div
       id={id}
       data-toc-label={id ? title : undefined}
-      className="prose-docs my-4 max-w-[760px] scroll-mt-20 rounded-lg border border-violet-500/30 bg-violet-500/5 p-5"
+      className="prose-docs my-4 scroll-mt-20 rounded-lg border border-violet-500/30 bg-violet-500/5 p-5"
     >
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">
         {title}
@@ -123,7 +166,7 @@ export function Derivation({
 
 export function Takeaway({ children }: { children: ReactNode }) {
   return (
-    <div className="prose-docs my-5 max-w-[760px] rounded-r-lg border-l-4 border-primary bg-primary/10 py-3 pl-4 pr-4">
+    <div className="prose-docs my-5 rounded-r-lg border-l-4 border-primary bg-primary/10 py-3 pl-4 pr-4">
       <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
         Key takeaway
       </div>
@@ -147,7 +190,7 @@ export function DiagramBlock({
     <figure
       id={id}
       data-toc-label={id ? title : undefined}
-      className="my-4 max-w-[760px] scroll-mt-20 rounded-lg border border-border bg-card p-5 text-center"
+      className="my-4 scroll-mt-20 rounded-lg border border-border bg-card p-5 text-center"
     >
       <figcaption className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         {title}

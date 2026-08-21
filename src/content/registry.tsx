@@ -3,9 +3,27 @@ import * as Lessons1To10 from "./linear-algebra-for-ml/lessons-1-10";
 import * as Lessons11To18 from "./linear-algebra-for-ml/lessons-11-18";
 import * as Lessons19To27 from "./linear-algebra-for-ml/lessons-19-27";
 import * as Lessons28To34 from "./linear-algebra-for-ml/lessons-28-34";
+import { FoundationsOverview } from "./machine-learning/module-1-overview";
+import { LearningParadigms } from "./machine-learning/topic-learning-paradigms";
+import { StatisticalDecisionTheory } from "./machine-learning/topic-statistical-decision-theory";
+import { BiasVarianceTradeoff } from "./machine-learning/topic-bias-variance-tradeoff";
+import { OverfittingUnderfittingCapacity } from "./machine-learning/topic-overfitting-capacity";
+import { LearningTheory } from "./machine-learning/topic-learning-theory";
+import { MaximumLikelihoodAndMap } from "./machine-learning/topic-mle-map";
+import { OptimizationOverview } from "./machine-learning/module-2-overview";
+import { ConvexOptimizationBasics } from "./machine-learning/topic-convex-optimization-basics";
+import { GradientDescentVariants } from "./machine-learning/topic-gradient-descent-variants";
+import { AcceleratedAdaptiveOptimizers } from "./machine-learning/topic-accelerated-adaptive-optimizers";
+import { SecondOrderQuasiNewton } from "./machine-learning/topic-second-order-quasi-newton";
+import { CoordinateProximalMethods } from "./machine-learning/topic-coordinate-proximal-methods";
+import { ConstrainedOptimizationDuality } from "./machine-learning/topic-constrained-optimization-duality";
+import { ExpectationMaximizationOptimization } from "./machine-learning/topic-em-as-optimization";
 
 export type LessonMeta = {
   slug: string;
+  /** Dotted number. Two segments ("2.3") is a top-level lesson or a module header;
+   *  three segments ("2.3.1") is a sub-topic nested under the module header whose
+   *  number is its first two segments — the sidebar groups purely off this string. */
   number: string;
   title: string;
   description: string;
@@ -289,8 +307,128 @@ const linearAlgebraForMl: ChapterContent = {
   ],
 };
 
+const machineLearning: ChapterContent = {
+  enabled: true,
+  id: "machine-learning",
+  label: "Machine Learning",
+  icon: "Brain",
+  description:
+    "Classical ML end to end — every model family derived from first principles, implemented by hand in Python and C++, and used the way production code actually uses it.",
+  lessons: [
+    {
+      slug: "foundations-of-learning",
+      number: "2.1",
+      title: "Foundations of Learning",
+      description: 'What "learning" means mathematically, and the ideas every model shares.',
+      Component: FoundationsOverview,
+    },
+    {
+      slug: "learning-paradigms",
+      number: "2.1.1",
+      title: "Learning Paradigms",
+      description:
+        "Supervised, unsupervised, semi-supervised, self-supervised & reinforcement learning.",
+      Component: LearningParadigms,
+    },
+    {
+      slug: "statistical-decision-theory",
+      number: "2.1.2",
+      title: "Statistical Decision Theory",
+      description:
+        "Expected risk, the Bayes-optimal predictor, and where loss functions come from.",
+      Component: StatisticalDecisionTheory,
+    },
+    {
+      slug: "bias-variance-tradeoff",
+      number: "2.1.3",
+      title: "Bias–Variance Trade-off",
+      description: "Decomposing prediction error into bias, variance, and irreducible noise.",
+      Component: BiasVarianceTradeoff,
+    },
+    {
+      slug: "overfitting-underfitting-capacity",
+      number: "2.1.4",
+      title: "Overfitting, Underfitting & Capacity",
+      description: "Training vs. generalization error, learning curves, and double descent.",
+      Component: OverfittingUnderfittingCapacity,
+    },
+    {
+      slug: "learning-theory",
+      number: "2.1.5",
+      title: "Learning Theory",
+      description:
+        "PAC learning, VC dimension, Rademacher complexity, and the No-Free-Lunch theorem.",
+      Component: LearningTheory,
+    },
+    {
+      slug: "mle-and-map",
+      number: "2.1.6",
+      title: "Maximum Likelihood & MAP",
+      description: "The single inference principle almost every loss function in ML derives from.",
+      Component: MaximumLikelihoodAndMap,
+    },
+    {
+      slug: "optimization-for-ml",
+      number: "2.2",
+      title: "Optimization for Machine Learning",
+      description: "The methods used to actually train every model in this chapter.",
+      Component: OptimizationOverview,
+    },
+    {
+      slug: "convex-optimization-basics",
+      number: "2.2.1",
+      title: "Convex Optimization Basics",
+      description: "Convex sets & functions, first/second-order conditions, global vs. local optima.",
+      Component: ConvexOptimizationBasics,
+    },
+    {
+      slug: "gradient-descent-variants",
+      number: "2.2.2",
+      title: "Gradient Descent & Variants",
+      description: "Batch, stochastic & mini-batch descent, convergence rates, and the learning rate.",
+      Component: GradientDescentVariants,
+    },
+    {
+      slug: "accelerated-adaptive-optimizers",
+      number: "2.2.3",
+      title: "Accelerated & Adaptive Optimizers",
+      description: "Momentum, Nesterov, AdaGrad, RMSProp, Adam & AdamW — derived, not just named.",
+      Component: AcceleratedAdaptiveOptimizers,
+    },
+    {
+      slug: "second-order-quasi-newton",
+      number: "2.2.4",
+      title: "Second-Order & Quasi-Newton Methods",
+      description: "Newton's method, the Hessian, IRLS, and BFGS / L-BFGS.",
+      Component: SecondOrderQuasiNewton,
+    },
+    {
+      slug: "coordinate-proximal-methods",
+      number: "2.2.5",
+      title: "Coordinate & Proximal Methods",
+      description: "Coordinate descent, subgradients, and the soft-thresholding operator behind Lasso.",
+      Component: CoordinateProximalMethods,
+    },
+    {
+      slug: "constrained-optimization-duality",
+      number: "2.2.6",
+      title: "Constrained Optimization & Duality",
+      description: "Lagrange multipliers, KKT conditions, and weak/strong duality — the SVM's engine.",
+      Component: ConstrainedOptimizationDuality,
+    },
+    {
+      slug: "em-as-optimization",
+      number: "2.2.7",
+      title: "Expectation–Maximization as Optimization",
+      description: "The ELBO, E-step/M-step, and why EM is guaranteed to never get worse.",
+      Component: ExpectationMaximizationOptimization,
+    },
+  ],
+};
+
 export const CONTENT_REGISTRY: Record<string, ChapterContent> = {
   [linearAlgebraForMl.id]: linearAlgebraForMl,
+  [machineLearning.id]: machineLearning,
 };
 
 export function getChapter(id: string): ChapterContent | undefined {
@@ -299,6 +437,18 @@ export function getChapter(id: string): ChapterContent | undefined {
 
 export function getLesson(chapterId: string, slug: string): LessonMeta | undefined {
   return getChapter(chapterId)?.lessons.find((l) => l.slug === slug);
+}
+
+/** For a sub-topic like "2.1.3", finds its module header lesson ("2.1"). Undefined for
+ *  top-level lessons/module headers themselves (two dotted segments or fewer). */
+export function getParentLesson(
+  chapter: ChapterContent,
+  lesson: LessonMeta,
+): LessonMeta | undefined {
+  const parts = lesson.number.split(".");
+  if (parts.length <= 2) return undefined;
+  const parentNumber = parts.slice(0, 2).join(".");
+  return chapter.lessons.find((l) => l.number === parentNumber);
 }
 
 export function allChapters(): ChapterContent[] {

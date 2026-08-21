@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   getChapter,
   getLesson,
+  getParentLesson,
   enabledLessons,
   isChapterEnabled,
   isLessonEnabled,
@@ -104,6 +105,7 @@ function DocPage() {
   // Re-derived directly from params (not loader data) — see the loader comment above.
   const chapter = getChapter(folder)!;
   const lesson = getLesson(folder, slug)!;
+  const parentModule = getParentLesson(chapter, lesson);
   const list = enabledLessons(chapter);
   const idx = list.findIndex((l) => l.slug === slug);
   const prev = idx > 0 ? list[idx - 1] : null;
@@ -221,6 +223,18 @@ function DocPage() {
               </Link>
               <ChevronRight className="h-3 w-3 opacity-60" />
               <span>{chapter.label}</span>
+              {parentModule && (
+                <>
+                  <ChevronRight className="h-3 w-3 opacity-60" />
+                  <Link
+                    to="/notes/u/$folder/$slug"
+                    params={{ folder: chapter.id, slug: parentModule.slug }}
+                    className="hover:text-foreground hover:underline"
+                  >
+                    {parentModule.title}
+                  </Link>
+                </>
+              )}
               <ChevronRight className="h-3 w-3 opacity-60" />
               <span className="truncate text-foreground">{lesson.title}</span>
             </nav>

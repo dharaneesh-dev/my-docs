@@ -23,7 +23,7 @@ export function CodeBlock({ code, lang = "python" }: { code: string; lang?: stri
   };
 
   return (
-    <div className="my-3 max-w-[760px] overflow-hidden rounded-md border border-border bg-muted/40">
+    <div className="my-3 overflow-hidden rounded-md border border-border bg-muted/40">
       <div className="flex items-center justify-between border-b border-border bg-background px-3 py-1.5 text-xs">
         <span className="font-mono uppercase tracking-wide text-muted-foreground">{lang}</span>
         <button
